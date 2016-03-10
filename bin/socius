@@ -5,10 +5,14 @@ if File.directory?(File.join(root,'.git'))
   Dir.chdir(root) do
     begin
       require 'bundler/setup'
+      require 'socius'
+
+      window = Socius::GameWindow.new
+      window.show
     rescue LoadError => e
       warn e.message
       warn "Run `gem install bundler` to install Bundler"
-      exit -1
+      exit(-1)
     end
   end
 end
