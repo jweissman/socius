@@ -95,7 +95,10 @@ describe TickCommand do
     CreateGameCommand.create(game_id: 'game_id', dimensions: 'dimensions')
   end
 
-  let(:tick_event) { TickEvent.create(game_id: 'game_id', progress_towards_step: (1/ticks_per_step.to_f)) }
+  # let(:tick_event) { TickEvent.create(game_id: 'game_id', progress_towards_step: (1/ticks_per_step.to_f)) }
+  let(:society_iterated_event) { 
+    SocietyIteratedEvent.create(society_id: society.id, production: 0, micro_production: 1, player_id: 'player_id')
+  }
 
   let(:society) { Society.last }
 
@@ -106,8 +109,8 @@ describe TickCommand do
     sim.apply setup_game_command
   end
 
-  it 'should trigger a tick event' do
-    expect(tick_command).to trigger_event(tick_event)
+  it 'should trigger a society iteration event' do
+    expect(tick_command).to trigger_event(society_iterated_event)
   end
 
   let(:ticks_per_step) { Game::STEP_LENGTH_IN_TICKS }

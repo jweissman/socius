@@ -68,15 +68,15 @@ module Socius
     end
   end
 
-  class TickEvent < Metacosm::Event
-    attr_accessor :game_id, :progress_towards_step
-  end
+  # class TickEvent < Metacosm::Event
+  #   attr_accessor :game_id #, :progress_towards_step
+  # end
 
-  class TickEventListener < Metacosm::EventListener
-    def receive(game_id:, progress_towards_step:)
-      # p [ :tick_event_listener ]
-      game_view = GameView.find_by(game_id: game_id)
-      game_view.update(progress_towards_step: progress_towards_step)
-    end
-  end
+  # class TickEventListener < Metacosm::EventListener
+  #   def receive(game_id:) #, progress_towards_step:)
+  #     # p [ :tick_event_listener ]
+  #     game_view = GameView.find_by(game_id: game_id)
+  #     game_view.update(progress_towards_step: progress_towards_step)
+  #   end
+  # end
 end

@@ -19,14 +19,14 @@ module Socius
       p [ :game, :tick! ]
 
       @ticks += 1
-      progress_towards_step = ((@ticks%STEP_LENGTH_IN_TICKS) / STEP_LENGTH_IN_TICKS.to_f)
+      # progress_towards_step = ((@ticks%STEP_LENGTH_IN_TICKS) / STEP_LENGTH_IN_TICKS.to_f)
 
-      if (@ticks % STEP_LENGTH_IN_TICKS) == 0
-        world.iterate
+      # if (@ticks % STEP_LENGTH_IN_TICKS) == 0
+      world.iterate
         # emit iteration event?
-      end
+      # end
 
-      emit(TickEvent.create(game_id: self.id, progress_towards_step: progress_towards_step))
+      # emit(TickEvent.create(game_id: self.id)) #, production_progress:  # progress_towards_step: progress_towards_step))
     end
   end
 end
