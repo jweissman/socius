@@ -69,13 +69,32 @@ module Socius
 
     def render(window, progress_towards_step)
       window.font.draw("Production (#{name}): #{production}", 100, 100, 1)
-
       anim = window.production_cell_animation
 
-      if progress_towards_step
-        img = anim[ 1 + ((progress_towards_step) * (anim.size-1).to_f).to_i ]
-        x,y = 100, 120
-        img.draw(x - img.width / 2.0, y - img.height / 2.0, 1, 1, 1) #, color, :add)
+      # origin of the first cell of prod meter
+      x0,y0 = 8, 124
+
+      # render each prod cell
+      if production
+        full_cell = anim[0]
+        production.times do |i|
+          x = x0 + i * 24
+          y = y0
+          full_cell.draw(x, y, 1, 1, 1) # - full_cell.width / 2.0, y - full_cell
+        end
+      end
+
+      # render next prod cell
+      if progress_towards_step && production # && progress_towards_step > 0.0
+        if progress_towards_step == 0.0
+          frame = anim.size - 1
+        else
+          frame = 1 + ((1.0-progress_towards_step) * (anim.size-1).to_f).to_i
+        end
+        p [ :progress, frame: frame, progress_towards_step: progress_towards_step ]
+        img = anim[frame]
+        x,y = x0 + production*24, y0
+        img.draw(x, y, 1, 1, 1) #, color, :add)
       end
     end
   end
