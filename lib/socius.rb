@@ -16,6 +16,8 @@ module Socius
   class Society < Metacosm::Model
     attr_accessor :name, :production, :game_id
 
+    PRODUCTION_LIMIT = 6
+
     belongs_to :world
     belongs_to :player
     has_many :cities
@@ -30,7 +32,9 @@ module Socius
 
     protected
     def aggregate_production!
-      @production += citizens.sum :production
+      if @production < PRODUCTION_LIMIT
+        @production += citizens.sum :production
+      end
     end
   end
 
@@ -85,7 +89,7 @@ module Socius
       end
 
       # render next prod cell
-      if progress_towards_step && production # && progress_towards_step > 0.0
+      if progress_towards_step && (production && production < Society::PRODUCTION_LIMIT)
         if progress_towards_step == 0.0
           frame = anim.size - 1
         else
@@ -122,7 +126,7 @@ module Socius
       progress_towards_step = ((@ticks%STEP_LENGTH_IN_TICKS) / STEP_LENGTH_IN_TICKS.to_f)
 
       if (@ticks % STEP_LENGTH_IN_TICKS) == 0
-        world.iterate 
+        world.iterate
         # emit iteration event?
       end
 
@@ -233,7 +237,7 @@ module Socius
   class GameSetupEventListener < Metacosm::EventListener
     def receive(game_id:, player_id:, player_name:)
       game_view = GameView.find_by(game_id: game_id)
-      game_view.create_player_view(player_id: player_id, name: player_name)
+      game_view.create_player_view(player_id: player_id, name: player_name, production: 0)
     end
   end
 
