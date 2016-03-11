@@ -2,7 +2,8 @@ module Socius
   class Society < Metacosm::Model
     attr_accessor :name, :production, :game_id
 
-    PRODUCTION_LIMIT = 6
+    RESOURCE_LIMIT = 6
+    PRODUCTION_LIMIT = RESOURCE_LIMIT
 
     belongs_to :world
     belongs_to :player

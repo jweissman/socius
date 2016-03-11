@@ -18,7 +18,7 @@ module Socius
       end
 
       # render progress
-      if progress
+      if progress && resource_count < Society::RESOURCE_LIMIT
         frame = if progress == 0.0
           anim.size - 1
         else
