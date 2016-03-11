@@ -1,5 +1,7 @@
 # socius
 
+![socius mockup](https://raw.githubusercontent.com/jweissman/socius/master/media/mockup.png)
+
 * [Homepage](https://rubygems.org/gems/socius)
 * [Documentation](http://rubydoc.info/gems/socius/frames)
 * [Email](mailto:jweissman1986 at gmail.com)
@@ -8,7 +10,7 @@
 
 ## Description
 
-TODO: Description
+Civlike + cards
 
 ## Features
 
