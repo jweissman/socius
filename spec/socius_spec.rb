@@ -72,13 +72,13 @@ describe SetupGameCommand do
   end
 
   let(:game_setup_event) do
-    GameSetupEvent.create(game_id: 'game_id', player_id: 'player_id')
+    GameSetupEvent.create(game_id: 'game_id', player_id: 'player_id', player_name: "Alice")
   end
 
   it 'should trigger game steup' do
     Metacosm::Simulation.current.apply(create_game_command)
 
-    expect(setup_game_command).to trigger_events(game_setup_event)
+    expect(setup_game_command).to trigger_event(game_setup_event)
   end
 end
 
@@ -95,7 +95,7 @@ describe TickCommand do
     CreateGameCommand.create(game_id: 'game_id', dimensions: 'dimensions')
   end
 
-  let(:tick_event) { TickEvent.create(game_id: 'game_id') }
+  let(:tick_event) { TickEvent.create(game_id: 'game_id', progress_towards_step: (1/ticks_per_step.to_f)) }
 
   let(:society) { Society.last }
 
@@ -107,11 +107,12 @@ describe TickCommand do
   end
 
   it 'should trigger a tick event' do
-    expect(tick_command).to trigger_events(tick_event)
+    expect(tick_command).to trigger_event(tick_event)
   end
 
+  let(:ticks_per_step) { Game::STEP_LENGTH_IN_TICKS }
   it 'should accumulate production' do
-    expect {sim.apply(tick_command)}.to change{society.production}.by(society.citizens.sum(:production))
+    expect {ticks_per_step.times { sim.apply(tick_command)}}.to change{society.production}.by(society.citizens.sum(:production))
   end
 end
 

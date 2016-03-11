@@ -2,30 +2,10 @@ require 'socius/version'
 require 'metacosm'
 require 'gosu'
 
+require 'socius/models/job'
+require 'socius/models/citizen'
+
 module Socius
-  class Job < Metacosm::Model
-    attr_accessor :name
-    attr_accessor :production, :food, :research, :gold
-    has_many :citizens
-    after_create { @production ||= 1 }
-
-    def self.farmer
-      @farmer ||= Job.create(name: "Farmer", production: 1, food: 2, research: 0, gold: 0)
-    end
-  end
-
-  class Citizen < Metacosm::Model
-    attr_accessor :name
-    belongs_to :city
-    belongs_to :job
-
-    after_create { self.job = Job.farmer }
-
-    def production
-      job.production
-    end
-  end
-
   class City < Metacosm::Model
     attr_accessor :name
     belongs_to :society
@@ -44,8 +24,13 @@ module Socius
     after_create { @production = 0; create_city }
 
     def iterate
-      @production += citizens.sum :production
+      aggregate_production!
       emit(SocietyIteratedEvent.create(society_id: id, production: @production, player_id: player.id))
+    end
+
+    protected
+    def aggregate_production!
+      @production += citizens.sum :production
     end
   end
 
@@ -55,8 +40,7 @@ module Socius
 
   class SocietyIteratedEventListener < Metacosm::EventListener
     def receive(society_id:, production:, player_id:)
-      # find player view?
-      player_view = PlayerView.find_by(player_id: player_id) #.first_or_create
+      player_view = PlayerView.find_by(player_id: player_id)
       player_view.production = production
     end
   end
@@ -93,28 +77,39 @@ module Socius
     has_one :world
     has_many :players
 
-    def setup(player_id:)
+    STEP_LENGTH_IN_TICKS = 100
+
+    def setup(player_name: "Alice", player_id:)
       create_world
-      player_one = create_player(id: player_id)
-      p1_society = player_one.create_society(world_id: world.id)
-      p1_capital = p1_society.create_city
-      p1_capital.create_citizen
-      emit(GameSetupEvent.create(game_id: self.id, player_id: player_one.id))
+      player_one = create_player(id: player_id, name: player_name)
+      player_one.create_society(world_id: world.id)
+
+      @ticks = 0
+      emit(GameSetupEvent.create(game_id: self.id, player_id: player_one.id, player_name: player_name))
     end
 
     def tick
       p [ :game, :tick! ]
-      world.iterate
-      emit(TickEvent.create(game_id: self.id))
+
+      @ticks += 1
+      progress_towards_step = ((@ticks%STEP_LENGTH_IN_TICKS) / STEP_LENGTH_IN_TICKS.to_f)
+
+      if (@ticks % STEP_LENGTH_IN_TICKS) == 0
+        world.iterate 
+        # emit iteration event?
+      end
+
+      emit(TickEvent.create(game_id: self.id, progress_towards_step: progress_towards_step))
     end
   end
 
   class GameView < Metacosm::View
-    attr_accessor :game_id, :dimensions
+    attr_accessor :game_id, :dimensions, :progress_towards_step
     has_many :player_views
 
     def render(window)
       window.font.draw("Welcome to Socius", 100, 10, 1)
+      window.font.draw("#{(progress_towards_step*100.0).to_i}%", 100, 40, 1) if progress_towards_step
       player_views.each do |player_view|
         player_view.render(window)
       end
@@ -125,28 +120,42 @@ module Socius
     SCALE = 16
     attr_accessor :width, :height, :font
     def initialize
-      self.width = 640
-      self.height = 480
+      self.width = 512
+      self.height = 512
       super(self.width, self.height)
       self.caption = "Socius #{Socius::VERSION}"
       @font = Gosu::Font.new(20)
 
-      simulation.fire(
-        CreateGameCommand.create(
-          game_id: game_id,
-          dimensions: [(self.width/SCALE).to_i, (self.height/SCALE).to_i]
-        )
-      )
-
+      simulation.apply(create_game)
+      simulation.apply(setup_game)
       simulation.conduct!
+
+      @background_image = Gosu::Image.new("media/mockup.png") #, :tileable => true)
+    end
+
+    def update
+      simulation.fire(TickCommand.create(game_id: game_id))
     end
 
     def draw
+      @background_image.draw(0,0,0)
       game_view = GameView.find_by(game_id: game_id)
       game_view.render(self) if game_view
     end
 
     protected
+    def create_game
+      CreateGameCommand.create(
+        game_id: game_id,
+        dimensions: [(self.width/SCALE).to_i, (self.height/SCALE).to_i]
+      )
+    end
+
+    def setup_game
+      SetupGameCommand.create(game_id: game_id, player_id: SecureRandom.uuid)
+    end
+
+    private
     def game_id
       @game_id ||= SecureRandom.uuid
     end
@@ -174,7 +183,6 @@ module Socius
     def receive(game_id:, dimensions:)
       p [ :game_created_event_listener ]
       GameView.create(game_id: game_id, dimensions: dimensions)
-      fire(SetupGameCommand.create(game_id: game_id, player_id: SecureRandom.uuid))
     end
   end
 
@@ -190,19 +198,13 @@ module Socius
   end
 
   class GameSetupEvent < Metacosm::Event
-    attr_accessor :game_id, :player_id
+    attr_accessor :game_id, :player_id, :player_name
   end
 
   class GameSetupEventListener < Metacosm::EventListener
-    def receive(game_id:, player_id:)
-      p [ :game_setup! ]
-
-      # create a player view
+    def receive(game_id:, player_id:, player_name:)
       game_view = GameView.find_by(game_id: game_id)
-      game_view.create_player_view(player_id: player_id)
-
-      # kick off circular tick command-event cycle
-      fire(TickCommand.create(game_id: game_id))
+      game_view.create_player_view(player_id: player_id, name: player_name)
     end
   end
 
@@ -212,140 +214,21 @@ module Socius
 
   class TickCommandHandler
     def handle(game_id:)
-      p [ :tick_command_handler ]
+      # p [ :tick_command_handler ]
       game = Game.find(game_id)
       game.tick
     end
   end
 
   class TickEvent < Metacosm::Event
-    attr_accessor :game_id
+    attr_accessor :game_id, :progress_towards_step
   end
 
   class TickEventListener < Metacosm::EventListener
-    def receive(game_id:)
-      p [ :tick_event_listener ]
-      fire(TickCommand.create(game_id: game_id))
+    def receive(game_id:, progress_towards_step:)
+      # p [ :tick_event_listener ]
+      game_view = GameView.find_by(game_id: game_id)
+      game_view.update(progress_towards_step: progress_towards_step)
     end
   end
-
-  # class CreateWorldCommand < Metacosm::Command
-  #   attr_accessor :game_id, :world_id, :dimensions
-  # end
-
-  # class CreateWorldCommandHandler
-  #   def handle(game_id:, world_id:, dimensions:)
-  #     game = Game.find(game_id)
-  #     game.create_world(id: world_id) #, dimensions: dimensions)
-  #   end
-  # end
-
-  # class WorldCreatedEvent < Metacosm::Event
-  #   attr_accessor :game_id, :world_id #, :dimensions
-  # end
-
-  # class WorldCreatedEventListener < Metacosm::EventListener
-  #   def receive(game_id:, world_id:)
-  #     # create world view?
-  #     fire(
-  #       CreatePlayerCommand.create(
-  #         name: "Alice",
-  #         game_id: game_id,
-  #         player_id: SecureRandom.uuid
-  #       )
-  #     )
-  #   end
-  # end
-
-  # class CreatePlayerCommand < Metacosm::Command
-  #   attr_accessor :game_id, :player_id, :name
-  # end
-
-  # class CreatePlayerCommandHandler
-  #   def handle(game_id:, player_id:, name:)
-  #     p [ :create_player_command_handler ]
-  #     game = Game.find(game_id)
-  #     game.create_player(name: name, id: player_id, game_id: game_id)
-  #   end
-  # end
-
-  # class PlayerCreatedEvent < Metacosm::Event
-  #   attr_accessor :name, :player_id, :game_id
-  # end
-
-  # class PlayerCreatedEventListener < Metacosm::EventListener
-  #   def receive(name:, player_id:, game_id:)
-  #     p [ :player_created_event_listener ]
-  #     game_view = GameView.find_by(game_id: game_id)
-  #     game_view.create_player_view(name: name, player_id: player_id, production: 0)
-
-  #     fire(CreateSocietyCommand.create(player_id: player_id, society_id: SecureRandom.uuid, game_id: game_id))
-  #   end
-  # end
-
-  # class CreateSocietyCommand < Metacosm::Command
-  #   attr_accessor :player_id, :society_id, :game_id
-  # end
-
-  # class CreateSocietyCommandHandler
-  #   def handle(player_id:, society_id:, game_id:)
-  #     player = Player.find(player_id)
-  #     player.create_society(id: society_id, game_id: game_id)
-  #   end
-  # end
-
-  # class SocietyCreatedEvent < Metacosm::Event
-  #   attr_accessor :society_id, :game_id
-  # end
-
-  # class SocietyCreatedEventListener < Metacosm::EventListener
-  #   def receive(society_id:, game_id:)
-  #     fire(CreateCityCommand.create(game_id: game_id, society_id: society_id, city_id: SecureRandom.uuid))
-  #     # fire(TickCommand.create(game_id: game_id))
-  #   end
-  # end
-
-  # class CreateCityCommand < Metacosm::Command
-  #   attr_accessor :game_id, :society_id, :city_id
-  # end
-
-  # class CreateCityCommandHandler
-  #   def handle(game_id:, society_id:, city_id:)
-  #     society = Society.find(society_id)
-  #     society.create_city(city_id: city_id, game_id: game_id)
-  #   end
-  # end
-
-  # class CityCreatedEvent < Metacosm::Event
-  #   attr_accessor :city_id, :game_id
-  # end
-
-  # class CityCreatedEventListener < Metacosm::EventListener
-  #   def receive(city_id:, game_id:)
-  #     fire(CreateCitizenCommand.create(city_id: city_id, game_id: game_id, id: SecureRandom.uuid))
-  #   end
-  # end
-
-  # class CreateCitizenCommand < Metacosm::Command
-  #   attr_accessor :city_id, :game_id, :citizen_id
-  # end
-
-  # class CreateCitizenCommandHandler
-  #   def handle(city_id:, game_id:, citizen_id:)
-  #     city = City.find(city_id)
-  #     city.create_citizen(game_id: game_id, id: citizen_id)
-  #   end
-  # end
-
-  # class CitizenCreatedEvent < Metacosm::Event
-  #   attr_accessor :citizen_id, :game_id
-  # end
-
-  # class CitizenCreatedEventListener < Metacosm::EventListener
-  #   def receive(citizen_id:, game_id:)
-  #     p [ :citizen_created! ]
-  #   end
-  # end
-
-
 end
