@@ -67,8 +67,16 @@ module Socius
     attr_accessor :name, :player_id, :production
     belongs_to :game_view
 
-    def render(window)
+    def render(window, progress_towards_step)
       window.font.draw("Production (#{name}): #{production}", 100, 100, 1)
+
+      anim = window.production_cell_animation
+
+      if progress_towards_step
+        img = anim[ 1 + ((progress_towards_step) * (anim.size-1).to_f).to_i ]
+        x,y = 100, 120
+        img.draw(x - img.width / 2.0, y - img.height / 2.0, 1, 1, 1) #, color, :add)
+      end
     end
   end
 
@@ -111,14 +119,14 @@ module Socius
       window.font.draw("Welcome to Socius", 100, 10, 1)
       window.font.draw("#{(progress_towards_step*100.0).to_i}%", 100, 40, 1) if progress_towards_step
       player_views.each do |player_view|
-        player_view.render(window)
+        player_view.render(window, progress_towards_step)
       end
     end
   end
 
   class GameWindow < Gosu::Window
     SCALE = 16
-    attr_accessor :width, :height, :font
+    attr_accessor :width, :height, :font, :production_cell_animation
     def initialize
       self.width = 512
       self.height = 512
@@ -131,6 +139,8 @@ module Socius
       simulation.conduct!
 
       @background_image = Gosu::Image.new("media/mockup.png") #, :tileable => true)
+
+      @production_cell_animation = Gosu::Image::load_tiles("media/production_cell.png", 32, 32)
     end
 
     def update
