@@ -1,6 +1,6 @@
 module Socius
   class Game < Metacosm::Model
-    attr_accessor :dimensions
+    attr_accessor :dimensions, :mode, :currently_held_citizen
     has_one :world
     has_many :players
 
@@ -19,6 +19,22 @@ module Socius
     def tick
       @ticks += 1
       world.iterate
+    end
+
+    def pickup(citizen)
+      self.currently_held_citizen = citizen
+
+      # don't want them to count/produce while being held
+      self.currently_held_citizen.job_id = nil
+
+      emit(CitizenPickedUpEvent.create(game_id: self.id))
+    end
+
+    def drop_citizen(new_job)
+     self.currently_held_citizen.job_id = new_job.id
+      self.currently_held_citizen = nil
+
+      emit(CitizenDroppedEvent.create(game_id: self.id))
     end
   end
 end

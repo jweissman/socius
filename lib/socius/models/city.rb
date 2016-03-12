@@ -8,19 +8,26 @@ module Socius
     def iterate
       # TODO aggregate food + grow!
 
-      emit(CityIteratedEvent.create({
-        city_id: self.id, 
-        society_id: society.id
-      }.merge(citizen_jobs: citizen_jobs_hash)))
+      emit(iteration_event)
     end
 
-    def citizen_jobs_hash
+    protected
+    def citizen_jobs_ids_hash
       citizens.all.inject({}) do |hash,citizen|
+        next if citizen.job.nil?
         job_sym = citizen.job.name.to_sym
-        hash[job_sym] ||= 0
-        hash[job_sym] += 1
+        hash[job_sym] ||= []
+        hash[job_sym] << citizen.id
         hash
       end
+    end
+
+    def iteration_event
+      CityIteratedEvent.create(
+        city_id: self.id,
+        society_id: society.id,
+        citizen_ids_by_job: citizen_jobs_ids_hash
+      )
     end
   end
 end

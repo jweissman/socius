@@ -4,6 +4,10 @@ module Socius
     attr_accessor :production, :food, :research, :gold, :faith, :culture
     has_many :citizens
 
+    def self.citizen_job_list
+      [ farmer, dreamer ]
+    end
+
     def self.farmer
       @farmer ||= Job.create(
         name: "farm",

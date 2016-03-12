@@ -26,16 +26,14 @@ module Socius
       if headless?
         puts "WARNING: asked game controller to #draw while headless (which is a no-op)"
       else
-        window.background_image.draw(0,0,0)
         game_view.render(window) if game_view
-        @cursor.draw(mouse_position.x, mouse_position.y,2)
       end
     end
 
     def button_down(id)
       if id == Gosu::MsLeft then
         # TODO include geometer and point helpers
-        command = game_view.clicked(at: mouse_position)
+        command = game_view.clicked at: mouse_position
         if command
           simulation.fire(command)
         end
@@ -74,12 +72,15 @@ module Socius
     end
 
     def prepare_assets
+      t0 = Time.now
+      p [ :loading_assets ]
       window.font = Gosu::Font.new(20)
       window.background_image = Gosu::Image.new("media/mockup.png")
       window.production_cell_animation = Gosu::Image::load_tiles("media/production_cell.png", 32, 32)
       window.citizen_image = Gosu::Image.new("media/citizen.png")
 
-      @cursor = Gosu::Image.new("media/cursor.png")
+      window.cursor = Gosu::Image.new("media/cursor.png")
+      p [ :asset_load_complete, elapsed: (Time.now-t0) ]
     end
 
     def simulation
