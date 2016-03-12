@@ -1,7 +1,7 @@
 module Socius
   class ResourceMeterView < Metacosm::View
     # attr_accessor :resource_name, :player_id
-    def render(window, cell_animation:, origin:, progress:, resource_count:)
+    def render(window, cell_animation:, origin:, progress:, resource_count:, color: 0xff_f00000)
 
       x0,y0 = *origin
       anim = cell_animation
@@ -13,7 +13,7 @@ module Socius
           x = x0 + i * 24
           y = y0
 
-          full_cell.draw(x,y,1,1,1)
+          full_cell.draw(x,y,1,1,1,color) #,:add)
         end
       end
 
@@ -27,7 +27,7 @@ module Socius
 
         img = anim[frame]
         x,y = x0 + resource_count*24, y0
-        img.draw(x,y,1,1,1)
+        img.draw(x,y,1,1,1,color) #,:add)
       end
 
 

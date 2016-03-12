@@ -14,12 +14,15 @@ module Socius
       @production = 0
       @micro_production = 0
 
+      @gold = 0
+      @micro_gold = 0
+
       create_city
     end
 
     def iterate
       # accumulate 100 micro-resources ---> create a new resource!
-      aggregate_production!
+      aggregate_resources!
       emit iteration_event
     end
 
@@ -28,11 +31,29 @@ module Socius
         society_id: self.id,
         player_id: player.id,
         production: @production,
-        micro_production: @micro_production
+        micro_production: @micro_production,
+        gold: @gold,
+        micro_gold: @micro_gold
       )
     end
 
     protected
+    def aggregate_resources!
+      aggregate_production!
+      aggregate_gold!
+    end
+
+    def aggregate_gold!
+      step = Game::STEP_LENGTH_IN_TICKS
+      if @gold < PRODUCTION_LIMIT
+        @micro_gold += citizens.sum(:gold)
+        if @micro_gold >= step
+          @gold += 1
+          @micro_gold -= step
+        end
+      end
+    end
+
     def aggregate_production!
       step = Game::STEP_LENGTH_IN_TICKS
       if @production < PRODUCTION_LIMIT
