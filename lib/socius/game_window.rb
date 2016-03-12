@@ -13,7 +13,7 @@ module Socius
       simulation.apply(setup_game)
       simulation.conduct!
 
-      @background_image = Gosu::Image.new("media/mockup.png") #, :tileable => true)
+      @background_image = Gosu::Image.new("media/mockup.png")
 
       @production_cell_animation = Gosu::Image::load_tiles("media/production_cell.png", 32, 32)
     end

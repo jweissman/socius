@@ -8,7 +8,7 @@ module Socius
     after_create { @production ||= 1 }
 
     def self.farmer
-      @farmer ||= Job.create(name: "Farmer", production: 1, food: 3, research: 0, gold: 1)
+      @farmer ||= Job.create(name: "Farmer", production: 1, food: 3, research: 2, gold: 3)
     end
   end
 end

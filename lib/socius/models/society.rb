@@ -7,6 +7,7 @@ module Socius
 
     belongs_to :world
     belongs_to :player
+
     has_many :cities
     has_many :citizens, :through => :cities
 
@@ -16,6 +17,9 @@ module Socius
 
       @gold = 0
       @micro_gold = 0
+
+      @research = 0
+      @micro_research = 0
 
       create_city
     end
@@ -33,7 +37,9 @@ module Socius
         production: @production,
         micro_production: @micro_production,
         gold: @gold,
-        micro_gold: @micro_gold
+        micro_gold: @micro_gold,
+        research: @research,
+        micro_research: @micro_research
       )
     end
 
@@ -41,12 +47,29 @@ module Socius
     def aggregate_resources!
       aggregate_production!
       aggregate_gold!
+      aggregate_research!
+    end
+
+    def aggregate_research!
+      step = Game::STEP_LENGTH_IN_TICKS
+      if @research < RESOURCE_LIMIT
+        research_growth = citizens.sum(:research)
+
+        p [ :research_growth, research_growth ]
+        @micro_research += research_growth #citizens.sum(:research)
+        if @micro_research >= step
+          @research += 1
+          @micro_research -= step
+        end
+      end
     end
 
     def aggregate_gold!
       step = Game::STEP_LENGTH_IN_TICKS
-      if @gold < PRODUCTION_LIMIT
-        @micro_gold += citizens.sum(:gold)
+      if @gold < RESOURCE_LIMIT
+        micro_gold_growth = citizens.sum(:gold)
+        p [ :micro_gold_growth, micro_gold_growth ]
+        @micro_gold += micro_gold_growth
         if @micro_gold >= step
           @gold += 1
           @micro_gold -= step
@@ -56,7 +79,7 @@ module Socius
 
     def aggregate_production!
       step = Game::STEP_LENGTH_IN_TICKS
-      if @production < PRODUCTION_LIMIT
+      if @production < RESOURCE_LIMIT
         @micro_production += citizens.sum(:production)
         if @micro_production >= step
           @production += 1

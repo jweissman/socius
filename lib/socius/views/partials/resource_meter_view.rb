@@ -1,5 +1,8 @@
 module Socius
   class ResourceMeterView < Metacosm::View
+    # belongs_to :player_view
+    # attr_accessor :resource
+
     # attr_accessor :resource_name, :player_id
     def render(window, cell_animation:, origin:, progress:, resource_count:, color: 0xff_f00000)
 
