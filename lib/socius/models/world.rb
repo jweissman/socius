@@ -6,7 +6,6 @@ module Socius
     has_many :cities, :through => :societies
 
     def iterate
-      p [ :world, :iterate ]
       societies.each(&:iterate)
     end
   end

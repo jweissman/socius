@@ -16,7 +16,6 @@ module Socius
     end
 
     def tick
-      p [ :game, :tick! ]
       @ticks += 1
       world.iterate
     end
