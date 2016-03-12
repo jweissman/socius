@@ -4,7 +4,6 @@ module Socius
     belongs_to :player_view
 
     attr_accessor :progress, :resource_count
-    
     after_create { @progress = 0; @resource_count = 0; }
 
     def render(window, cell_animation:)

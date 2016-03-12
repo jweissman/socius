@@ -1,20 +1,21 @@
 module Socius
   class SocietyIteratedEventListener < Metacosm::EventListener
-    def receive(
-      society_id:,
-      player_id:,
-      production:, 
-      production_progress:, 
-      gold:, 
-      gold_progress:, 
-      research:, 
-      research_progress:,
-      culture:,
-      culture_progress:,
-      faith:,
-      faith_progress:)
-
+    def receive(society_id:, player_id:, resources:)
       player_view = PlayerView.find_by(player_id: player_id)
+      update_resource_meters(player_view, resources)
+    end
+
+    def update_resource_meters(player_view,
+                               production:,
+                               production_progress:,
+                               gold:,
+                               gold_progress:,
+                               research:,
+                               research_progress:,
+                               culture:,
+                               culture_progress:,
+                               faith:,
+                               faith_progress:)
 
       player_view.gold_meter.
         update(progress: gold_progress, resource_count: gold)

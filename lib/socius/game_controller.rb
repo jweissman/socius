@@ -1,9 +1,4 @@
 module Socius
-  class MouseView
-    def render(window,position)
-
-    end
-  end
   # wrap around a window
   class GameController < Struct.new(:window)
     include Geometer::PointHelpers
@@ -29,7 +24,7 @@ module Socius
 
     def draw
       if headless?
-        puts "WARNING: asked to #draw in headless mode, which is a no-op"
+        puts "WARNING: asked game controller to #draw while headless (which is a no-op)"
       else
         window.background_image.draw(0,0,0)
         game_view.render(window) if game_view
@@ -70,7 +65,7 @@ module Socius
     end
 
     def setup_game
-      SetupGameCommand.create(game_id: game_id, player_id: SecureRandom.uuid)
+      SetupGameCommand.create(game_id: game_id, player_id: SecureRandom.uuid, city_id: SecureRandom.uuid, player_name: "Joe", city_name: "Cerulean City")
     end
 
     private
@@ -82,6 +77,7 @@ module Socius
       window.font = Gosu::Font.new(20)
       window.background_image = Gosu::Image.new("media/mockup.png")
       window.production_cell_animation = Gosu::Image::load_tiles("media/production_cell.png", 32, 32)
+      window.citizen_image = Gosu::Image.new("media/citizen.png")
 
       @cursor = Gosu::Image.new("media/cursor.png")
     end

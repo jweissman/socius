@@ -16,14 +16,14 @@ module Socius
       RESOURCE_NAMES.each do |resource_name|
         create_resource(name: resource_name)
       end
-      create_city
     end
 
     def iterate
-      resources.each(&:aggregate!)
+      resources.each(&:aggregate)
+      cities.each(&:iterate)
       emit iteration_event
     end
-    
+
     RESOURCE_NAMES.each do |resource_name|
       define_method(resource_name.to_sym) do
         resources.where(name: resource_name).first
@@ -33,24 +33,20 @@ module Socius
     protected
     def iteration_event
       SocietyIteratedEvent.create(
-        society_id: self.id,
-        player_id: player.id,
-
-        production: production.amount,
-        production_progress: production.progress_as_percent,
-
-        gold: gold.amount,
-        gold_progress: gold.progress_as_percent,
-
-        research: research.amount,
-        research_progress: research.progress_as_percent,
-
-        faith: faith.amount,
-        faith_progress: faith.progress_as_percent,
-
-        culture: culture.amount,
-        culture_progress: culture.progress_as_percent
+        {
+          society_id: self.id,
+          player_id: player.id
+        }.merge(resources: resources_hash)
       )
+    end
+
+    def resources_hash
+      resources.inject({}) do |hash, resource|
+        # resource = send(resource.name.to_sym)
+        hash[:"#{resource.name}"] = resource.amount
+        hash[:"#{resource.name}_progress"] = resource.progress_as_percent
+        hash
+      end
     end
   end
 end

@@ -4,7 +4,7 @@ module Socius
     belongs_to :society
     after_create { @amount = 0; @progress = 0; }
 
-    def aggregate!
+    def aggregate
       if @amount < Society::RESOURCE_LIMIT
         @progress += growth
         if @progress >= step_increment

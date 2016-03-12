@@ -1,6 +1,7 @@
 module Socius
   class PlayerView < Metacosm::View
-    attr_accessor :name, :player_id
+    attr_accessor :name, :player_id, :focused_city_id
+    has_many :city_views
 
     after_create {
       create_resource_meter_view(resource: 'production', origin: [8,124], color: 0xff_b0d0f0)
@@ -35,9 +36,16 @@ module Socius
 
     def render(window)
       cell_animation = window.production_cell_animation
+
       resource_meter_views.each do |resource_meter_view|
         resource_meter_view.render(window, cell_animation: cell_animation)
       end
+
+      focused_city_view.render(window) if focused_city_id
+    end
+
+    def focused_city_view
+      CityView.find_by(city_id: focused_city_id)
     end
   end
 end

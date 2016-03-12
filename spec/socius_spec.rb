@@ -38,33 +38,13 @@ describe CreateGameCommand do
   end
 end
 
-describe SetupGameCommand do
-  subject(:setup_game_command) do
-    SetupGameCommand.create(game_id: 'game_id', player_id: 'player_id')
-  end
-
-  let(:create_game_command) do
-    CreateGameCommand.create(game_id: 'game_id', dimensions: 'dimensions')
-  end
-
-  let(:game_setup_event) do
-    GameSetupEvent.create(game_id: 'game_id', player_id: 'player_id', player_name: "Alice")
-  end
-
-  it 'should trigger game steup' do
-    Metacosm::Simulation.current.apply(create_game_command)
-
-    expect(setup_game_command).to trigger_event(game_setup_event)
-  end
-end
-
 describe TickCommand do
   subject(:tick_command) do
     TickCommand.create(game_id: 'game_id')
   end
 
   let(:setup_game_command) do
-    SetupGameCommand.create(game_id: 'game_id', player_id: 'player_id')
+    SetupGameCommand.create(game_id: 'game_id', player_id: 'player_id', player_name: 'Thomas', city_name: 'London', city_id: 'city_id')
   end
 
   let(:create_game_command) do
@@ -74,11 +54,13 @@ describe TickCommand do
   let(:society_iterated_event) {
     SocietyIteratedEvent.create(
       society_id: society.id, player_id: 'player_id',
-      production: 0, production_progress: 0.01,
-      gold: 0,  gold_progress: 0.03,
-      research: 0, research_progress: 0.02,
-      faith: 0, faith_progress: 0.01,
-      culture: 0, culture_progress: 0.02
+      resources: {
+        production: 0, production_progress: 0.01,
+        gold: 0,  gold_progress: 0.03,
+        research: 0, research_progress: 0.02,
+        faith: 0, faith_progress: 0.01,
+        culture: 0, culture_progress: 0.02
+      }
     )
   }
 
@@ -96,7 +78,7 @@ describe TickCommand do
   end
 
   let(:ticks_per_step) { Game::STEP_LENGTH_IN_TICKS }
-  it 'should accumulate production' do
+  it 'should accumulate production', speed: :slow do
     expect {ticks_per_step.times { sim.apply(tick_command)}}.to change{society.production.amount}.by(society.citizens.sum(:production))
   end
 end
