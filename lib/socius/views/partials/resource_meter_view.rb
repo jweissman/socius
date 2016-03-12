@@ -1,10 +1,13 @@
 module Socius
   class ResourceMeterView < Metacosm::View
-    # belongs_to :player_view
-    # attr_accessor :resource
+    attr_accessor :origin, :color, :resource
+    belongs_to :player_view
 
-    # attr_accessor :resource_name, :player_id
-    def render(window, cell_animation:, origin:, progress:, resource_count:, color: 0xff_f00000)
+    attr_accessor :progress, :resource_count
+    
+    after_create { @progress = 0; @resource_count = 0; }
+
+    def render(window, cell_animation:)
 
       x0,y0 = *origin
       anim = cell_animation
@@ -16,7 +19,7 @@ module Socius
           x = x0 + i * 24
           y = y0
 
-          full_cell.draw(x,y,1,1,1,color) #,:add)
+          full_cell.draw(x,y,1,1,1,color)
         end
       end
 
@@ -30,12 +33,8 @@ module Socius
 
         img = anim[frame]
         x,y = x0 + resource_count*24, y0
-        img.draw(x,y,1,1,1,color) #,:add)
+        img.draw(x,y,1,1,1,color)
       end
-
-
-      # TODO track each resource independently
-      #      note that 2 workers need to produce twice as fast as one
     end
   end
 end
