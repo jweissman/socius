@@ -7,6 +7,7 @@ require 'socius/models/citizen'
 require 'socius/models/city'
 require 'socius/models/society'
 require 'socius/models/world'
+require 'socius/models/resource'
 require 'socius/models/player'
 require 'socius/models/game'
 

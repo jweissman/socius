@@ -86,7 +86,12 @@ describe TickCommand do
   end
 
   let(:society_iterated_event) { 
-    SocietyIteratedEvent.create(society_id: society.id, production: 0, micro_production: 1, player_id: 'player_id', micro_gold: 3, gold: 0, micro_research: 2, research: 0)
+    SocietyIteratedEvent.create(
+      society_id: society.id, player_id: 'player_id',
+      production: 0, production_progress: 0.01, 
+      gold: 0,  gold_progress: 0.03,
+      research: 0, research_progress: 0.02
+    )
   }
 
   let(:society) { Society.last }
@@ -104,6 +109,6 @@ describe TickCommand do
 
   let(:ticks_per_step) { Game::STEP_LENGTH_IN_TICKS }
   it 'should accumulate production' do
-    expect {ticks_per_step.times { sim.apply(tick_command)}}.to change{society.production}.by(society.citizens.sum(:production))
+    expect {ticks_per_step.times { sim.apply(tick_command)}}.to change{society.production.amount}.by(society.citizens.sum(:production))
   end
 end

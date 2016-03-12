@@ -1,8 +1,8 @@
 module Socius
   class SocietyIteratedEvent < Metacosm::Event
     attr_accessor :society_id, :player_id
-    attr_accessor :production, :micro_production
-    attr_accessor :gold, :micro_gold
-    attr_accessor :research, :micro_research
+    attr_accessor :production, :production_progress
+    attr_accessor :gold, :gold_progress
+    attr_accessor :research, :research_progress
   end
 end
