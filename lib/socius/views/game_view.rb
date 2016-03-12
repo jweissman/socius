@@ -12,6 +12,8 @@ module Socius
     end
 
     def clicked(at:)
+      p [ :clicked, at: at ]
+      nil
       # hit_city_job_tab = city_job_menu.tabs.detect { |tab| tab.hit?(at) }
       # if hit_city_job_tab
       #   # need to fire a command...

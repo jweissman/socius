@@ -1,7 +1,15 @@
 module Socius
+  class MouseView
+    def render(window,position)
+
+    end
+  end
   # wrap around a window
   class GameController < Struct.new(:window)
     include Geometer::PointHelpers
+
+    # current citizen id selected
+    # whether we are even in 'drag citizen' mode at all
 
     # scale of the map?
     SCALE = 16
@@ -25,13 +33,14 @@ module Socius
       else
         window.background_image.draw(0,0,0)
         game_view.render(window) if game_view
+        @cursor.draw(mouse_position.x, mouse_position.y,2)
       end
     end
 
     def button_down(id)
       if id == Gosu::MsLeft then
         # TODO include geometer and point helpers
-        command = game_view.clicked(at: coord(window.mouse_x, window.mouse_y))
+        command = game_view.clicked(at: mouse_position)
         if command
           simulation.fire(command)
         end
@@ -39,6 +48,10 @@ module Socius
     end
 
     protected
+    def mouse_position
+      coord(window.mouse_x, window.mouse_y)
+    end
+
     def headless?
       @headless == true
     end
@@ -69,6 +82,8 @@ module Socius
       window.font = Gosu::Font.new(20)
       window.background_image = Gosu::Image.new("media/mockup.png")
       window.production_cell_animation = Gosu::Image::load_tiles("media/production_cell.png", 32, 32)
+
+      @cursor = Gosu::Image.new("media/cursor.png")
     end
 
     def simulation
