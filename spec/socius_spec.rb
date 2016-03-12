@@ -90,7 +90,9 @@ describe TickCommand do
       society_id: society.id, player_id: 'player_id',
       production: 0, production_progress: 0.01, 
       gold: 0,  gold_progress: 0.03,
-      research: 0, research_progress: 0.02
+      research: 0, research_progress: 0.02,
+      faith: 0, faith_progress: 0.01,
+      culture: 0, culture_progress: 0.02
     )
   }
 

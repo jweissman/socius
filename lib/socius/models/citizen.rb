@@ -8,6 +8,6 @@ module Socius
 
     after_create { self.job = Job.farmer }
 
-    def_delegators :job, :production, :gold, :food, :research
+    def_delegators :job, :production, :gold, :food, :research, :faith, :culture
   end
 end
