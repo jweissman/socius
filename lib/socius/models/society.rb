@@ -23,7 +23,7 @@ module Socius
       resources.each(&:aggregate!)
       emit iteration_event
     end
-
+    
     RESOURCE_NAMES.each do |resource_name|
       define_method(resource_name.to_sym) do
         resources.where(name: resource_name).first

@@ -15,20 +15,6 @@ describe World do
   it 'should have a name' do
     expect(world.name).to eq("Ea")
   end
-
-  xit 'should have cities' do
-    binding.pry
-    world.create_city
-    expect(world.cities.first).to be_a(City)
-  end
-
-  let(:setup_game_command) do
-    SetupGameCommand.create(game_id: 'game_id')
-  end
-
-  let(:create_game_command) do
-    CreateGameCommand.create(game_id: 'game_id', dimensions: 'dimensions')
-  end
 end
 
 describe Society do
@@ -85,10 +71,10 @@ describe TickCommand do
     CreateGameCommand.create(game_id: 'game_id', dimensions: 'dimensions')
   end
 
-  let(:society_iterated_event) { 
+  let(:society_iterated_event) {
     SocietyIteratedEvent.create(
       society_id: society.id, player_id: 'player_id',
-      production: 0, production_progress: 0.01, 
+      production: 0, production_progress: 0.01,
       gold: 0,  gold_progress: 0.03,
       research: 0, research_progress: 0.02,
       faith: 0, faith_progress: 0.01,
@@ -112,5 +98,23 @@ describe TickCommand do
   let(:ticks_per_step) { Game::STEP_LENGTH_IN_TICKS }
   it 'should accumulate production' do
     expect {ticks_per_step.times { sim.apply(tick_command)}}.to change{society.production.amount}.by(society.citizens.sum(:production))
+  end
+end
+
+describe GameController do
+  subject(:game_controller) { GameController.new(window) }
+  let(:window)              { instance_double(Gosu::Window, mouse_x: 0, mouse_y: 0) }
+  let(:left_mouse_btn)      { Gosu::MsLeft }
+  let(:game_view)           { instance_spy(GameView, :clicked => command) }
+  let(:command)             { :some_command }
+  let(:sim)                 { instance_double(Metacosm::Simulation) }
+
+  it 'should fire commands on clicks' do
+    allow(game_controller).to receive(:game_view).and_return(game_view)
+    allow(game_controller).to receive(:simulation).and_return(sim)
+
+    expect(sim).to receive(:fire).with(command)
+
+    game_controller.button_down(left_mouse_btn)
   end
 end

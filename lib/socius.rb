@@ -1,6 +1,8 @@
-require 'socius/version'
 require 'metacosm'
+require 'geometer'
 require 'gosu'
+
+require 'socius/version'
 
 require 'socius/models/job'
 require 'socius/models/citizen'
@@ -31,4 +33,5 @@ require 'socius/views/player_view'
 require 'socius/views/game_view'
 require 'socius/views/partials/resource_meter_view'
 
+require 'socius/game_controller'
 require 'socius/game_window'

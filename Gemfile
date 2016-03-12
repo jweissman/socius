@@ -6,6 +6,7 @@ gemspec
 
 gem 'metacosm'
 gem 'gosu'
+gem 'geometer'
 
 group :development do
   gem 'kramdown'
