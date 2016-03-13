@@ -1,15 +1,14 @@
 module Socius
   class ResourceMeterView < Metacosm::View
     attr_accessor :origin, :color, :resource
-    belongs_to :player_view
+    belongs_to :resource_meter_widget
 
     attr_accessor :progress, :resource_count
     after_create { @progress = 0; @resource_count = 0; }
 
-    def render(window, cell_animation:)
-
+    def render(window)
       x0,y0 = *origin
-      anim = cell_animation
+      anim = window.production_cell_animation
 
       # render existing cells
       if resource_count > 0
@@ -18,7 +17,7 @@ module Socius
           x = x0 + i * 24
           y = y0
 
-          full_cell.draw(x,y,1,1,1,color)
+          full_cell.draw(x,y-1,1,1,1,color)
         end
       end
 

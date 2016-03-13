@@ -9,10 +9,7 @@ module Socius
     has_one :player_view
 
     def render(window)
-      window.background_image.draw(0,0,0)
-      window.font.draw(
-        "Welcome, #{player_view.name}", 350, 476, 1)
-
+      window.socius_logo.draw(0,552,0)
       player_view.render(window)
       draw_cursor(window)
     end

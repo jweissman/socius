@@ -22,6 +22,7 @@ module Socius
     }
 
     def render(window)
+      window.job_view_menu_image.draw(0,0,0)
       job_views.each do |job_view|
         job_view.render(window)
       end
@@ -31,8 +32,6 @@ module Socius
       if growth_progress
         anim = window.growth_meter_animation
         progress = growth_progress
-
-
         frame = if progress == 0.0
                   anim.size - 1
                 else

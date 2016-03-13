@@ -40,6 +40,7 @@ require 'socius/listeners/citizen_picked_up_event_listener'
 require 'socius/listeners/citizen_dropped_event_listener'
 
 require 'socius/views/partials/resource_meter_view'
+require 'socius/views/widgets/resource_meter_widget'
 
 require 'socius/views/player_view'
 require 'socius/views/job_view'

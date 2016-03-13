@@ -75,7 +75,7 @@ module Socius
       t0 = Time.now
       p [ :loading_assets ]
       window.font = Gosu::Font.new(20)
-      window.background_image = Gosu::Image.new("media/mockup.png")
+      # window.background_image = Gosu::Image.new("media/mockup.png")
       window.production_cell_animation = Gosu::Image::load_tiles("media/production_cell.png", 32, 32)
       window.citizen_image = Gosu::Image.new("media/citizen.png")
 
@@ -83,6 +83,13 @@ module Socius
       window.growth_meter_animation = Gosu::Image.load_tiles("media/growth_meter.png", 56,12)
 
       window.cursor = Gosu::Image.new("media/cursor.png")
+
+      window.job_view_menu_image = Gosu::Image.new("media/job_views.png")
+      window.resource_meters_image = Gosu::Image.new("media/resource_meters.png")
+      window.socius_logo = Gosu::Image.new("media/socius_logo.png")
+      window.player_hand = Gosu::Image.new("media/player_hand.png")
+      window.terrain_tiles = Gosu::Image.new("media/terrain.png")
+
       p [ :asset_load_complete, elapsed: (Time.now-t0) ]
     end
 
