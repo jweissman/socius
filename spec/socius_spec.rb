@@ -56,15 +56,15 @@ describe TickCommand do
       society_id: society.id, player_id: 'player_id',
       resources: {
         production: 0, production_progress: 0.01 * citizen_count,
-        gold: 0,  gold_progress: 0.00,
-        research: 0, research_progress: 0.00,
-        faith: 0, faith_progress: 0.00,
-        culture: 0, culture_progress: 0.00
+        gold: 0,  gold_progress: 0,
+        research: 0, research_progress: 0,
+        faith: 0, faith_progress: 0,
+        culture: 0, culture_progress: 0
       }
     )
   }
 
-  let(:citizen_count) { 2 }
+  let(:citizen_count) { 3 }
 
   let(:society) { Society.last }
 

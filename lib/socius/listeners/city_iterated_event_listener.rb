@@ -1,7 +1,8 @@
 module Socius
   class CityIteratedEventListener < Metacosm::EventListener
-    def receive(society_id:,city_id:,citizen_ids_by_job:)
+    def receive(society_id:,city_id:,citizen_ids_by_job:,growth_progress:)
       city_view = CityView.find_by(city_id: city_id)
+      city_view.update growth_progress: growth_progress
       # p [ citizen_ids_by_job: citizen_ids_by_job ]
       update_job_tallies(city_view, citizen_ids_by_job || {})
     end

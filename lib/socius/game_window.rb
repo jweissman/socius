@@ -2,6 +2,7 @@ module Socius
   class GameWindow < Gosu::Window
     attr_accessor :width, :height, :font
     attr_accessor :production_cell_animation, :citizen_image, :cursor
+    attr_accessor :city_image, :growth_meter_animation
     attr_accessor :background_image
     attr_accessor :controller
 

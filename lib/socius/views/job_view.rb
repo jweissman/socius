@@ -12,7 +12,7 @@ module Socius
     def render(window)
       if citizen_count && citizen_count > 0
         citizen_count.times do |i|
-          window.citizen_image.draw(origin.x + 4*i,origin.y,0)
+          window.citizen_image.draw(origin.x + 16*i,origin.y,0)
         end
       end
     end

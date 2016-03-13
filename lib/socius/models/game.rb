@@ -23,11 +23,7 @@ module Socius
 
     def pickup(citizen)
       self.currently_held_citizen = citizen
-
-      # don't want them to count/produce while being held
       self.currently_held_citizen.job_id = nil
-
-      # p [ :pickup, citizen_count: 
 
       emit(CitizenPickedUpEvent.create(game_id: self.id))
     end

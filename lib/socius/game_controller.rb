@@ -79,6 +79,9 @@ module Socius
       window.production_cell_animation = Gosu::Image::load_tiles("media/production_cell.png", 32, 32)
       window.citizen_image = Gosu::Image.new("media/citizen.png")
 
+      window.city_image = Gosu::Image.new("media/tower.png")
+      window.growth_meter_animation = Gosu::Image.load_tiles("media/growth_meter.png", 56,12)
+
       window.cursor = Gosu::Image.new("media/cursor.png")
       p [ :asset_load_complete, elapsed: (Time.now-t0) ]
     end
