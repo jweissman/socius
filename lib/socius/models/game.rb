@@ -4,6 +4,9 @@ module Socius
     has_one :world
     has_many :players
 
+    # TODO de-overload this... it no longer really means this
+    #      it's like 'how hard it is to get a resource' (other than food which
+    #      now has it's own logic...)
     STEP_LENGTH_IN_TICKS = 100
 
     def setup(player_name:, player_id:, city_name:, city_id:)

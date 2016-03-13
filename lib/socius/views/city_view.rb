@@ -6,7 +6,7 @@ module Socius
     attr_accessor :city_id, :city_name
     attr_reader :farm_tally, :mine_tally, :pray_tally, :trade_tally, :study_tally, :dream_tally
 
-    attr_accessor :growth_progress
+    attr_accessor :growth_progress, :starving
 
     belongs_to :player_view
     has_many   :job_views
@@ -40,8 +40,12 @@ module Socius
                 end
         # p [ :city_view_render, growth_progress: growth_progress, growth_frame: frame, anim_size: anim.size ]
         img = anim[frame]
-        img.draw(308,215,1,1,1)
+        img.draw(308,215,1,1,1,growth_meter_color)
       end
+    end
+
+    def growth_meter_color
+      starving ? 0xf0_f0c0c0 : 0xf0_c0f0c0
     end
 
     def job_view_bounding_boxes

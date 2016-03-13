@@ -1,5 +1,5 @@
 module Socius
   class CityIteratedEvent < Metacosm::Event
-    attr_accessor :society_id, :city_id, :citizen_ids_by_job, :growth_progress
+    attr_accessor :society_id, :city_id, :citizen_ids_by_job, :growth_progress, :starving
   end
 end

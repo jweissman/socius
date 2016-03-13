@@ -14,7 +14,7 @@ module Socius
         production: 1,
         food: 3,
         research: 0,
-        gold: 0,
+        gold: 1,
         faith: 0,
         culture: 0
       )
@@ -24,7 +24,7 @@ module Socius
       @dreamer ||= Job.create(
         name: "dream",
         production: 0,
-        food: 0,
+        food: -1,
         research: 1,
         gold: 0,
         faith: 0,
@@ -49,7 +49,7 @@ module Socius
       @acolyte ||= Job.create(
         name: "pray",
         production: 0,
-        food: 0,
+        food: -1,
         research: 0,
         gold: 0,
         faith: 2,
@@ -61,7 +61,7 @@ module Socius
       @scholar ||= Job.create(
         name: "study",
         production: 0,
-        food: 0,
+        food: -1,
         research: 2,
         gold: 0,
         faith: 0,
@@ -73,7 +73,7 @@ module Socius
       @merchant ||= Job.create(
         name: "trade",
         production: 1,
-        food: 0,
+        food: -1,
         research: 0,
         gold: 2,
         faith: 0,
