@@ -17,7 +17,6 @@ module Socius
     def draw_cursor(window)
       mouse = mouse_position(window)
       window.cursor.draw(mouse.x, mouse.y,2)
-
       if holding_citizen
         window.citizen_image.draw(mouse.x, mouse.y, 3)
       end

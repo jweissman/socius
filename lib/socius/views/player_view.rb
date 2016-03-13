@@ -16,7 +16,7 @@ module Socius
     def render(window)
       resource_meter_widget.render(window)
       focused_city_view.render(window) if focused_city_id
-      window.player_hand.draw(168,288,0)
+      window.player_hand.draw(268,418,0)
     end
 
     def focused_city_view
