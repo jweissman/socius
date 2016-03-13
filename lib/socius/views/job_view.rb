@@ -20,7 +20,9 @@ module Socius
 
       if citizen_count && citizen_count > 0
         citizen_count.times do |i|
-          window.citizen_image.draw(origin.x + 16*i,origin.y,0)
+          n = i % (dimensions.width / 16).to_i
+          m = (i / (dimensions.width / 16)).to_i
+          window.citizen_image.draw(origin.x + 16*n,origin.y+8*m,0)
         end
       end
     end

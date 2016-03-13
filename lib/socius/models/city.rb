@@ -6,7 +6,7 @@ module Socius
     has_many :citizens
 
     after_create do
-      @food_amount = 1_000
+      @food_amount = 1_800
       3.times { create_citizen }
     end
 
@@ -50,7 +50,7 @@ module Socius
     end
 
     def food_required_to_grow
-      1_200 + ((25*citizens.count) ** 2)
+      1_200 + ((5*citizens.count) ** 2)
     end
 
     def iteration_event
