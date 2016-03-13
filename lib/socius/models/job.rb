@@ -5,7 +5,7 @@ module Socius
     has_many :citizens
 
     def self.citizen_job_list
-      [ farmer, dreamer ]
+      [ farmer, dreamer, miner, acolyte, merchant, scholar ]
     end
 
     def self.farmer
@@ -29,6 +29,55 @@ module Socius
         gold: 0,
         faith: 0,
         culture: 3
+      )
+    end
+
+    def self.miner
+      @miner ||= Job.create(
+        name: "mine",
+        production: 2,
+        food: 0,
+        research: 0,
+        gold: 1,
+        faith: 0,
+        culture: 0 
+      )
+
+    end
+
+    def self.acolyte
+      @acolyte ||= Job.create(
+        name: "pray",
+        production: 0,
+        food: 0,
+        research: 0,
+        gold: 0,
+        faith: 2,
+        culture: 1
+      )
+    end
+
+    def self.scholar
+      @scholar ||= Job.create(
+        name: "study",
+        production: 0,
+        food: 0,
+        research: 2,
+        gold: 0,
+        faith: 0,
+        culture: 1
+      )
+    end
+
+    def self.merchant
+      @merchant ||= Job.create(
+        name: "trade",
+        production: 1,
+        food: 0,
+        research: 0,
+        gold: 2,
+        faith: 0,
+        culture: 0
       )
     end
   end

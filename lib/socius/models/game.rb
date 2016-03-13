@@ -27,11 +27,13 @@ module Socius
       # don't want them to count/produce while being held
       self.currently_held_citizen.job_id = nil
 
+      # p [ :pickup, citizen_count: 
+
       emit(CitizenPickedUpEvent.create(game_id: self.id))
     end
 
     def drop_citizen(new_job)
-     self.currently_held_citizen.job_id = new_job.id
+      self.currently_held_citizen.job_id = new_job.id
       self.currently_held_citizen = nil
 
       emit(CitizenDroppedEvent.create(game_id: self.id))
