@@ -55,14 +55,16 @@ describe TickCommand do
     SocietyIteratedEvent.create(
       society_id: society.id, player_id: 'player_id',
       resources: {
-        production: 0, production_progress: 0.01,
-        gold: 0,  gold_progress: 0.03,
-        research: 0, research_progress: 0.02,
-        faith: 0, faith_progress: 0.01,
-        culture: 0, culture_progress: 0.02
+        production: 0, production_progress: 0.01 * citizen_count,
+        gold: 0,  gold_progress: 0.00,
+        research: 0, research_progress: 0.00,
+        faith: 0, faith_progress: 0.00,
+        culture: 0, culture_progress: 0.00
       }
     )
   }
+
+  let(:citizen_count) { 2 }
 
   let(:society) { Society.last }
 

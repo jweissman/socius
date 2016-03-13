@@ -31,7 +31,7 @@ module Socius
         rect.contains?(at)
       end&.first
 
-      if clicked_job_tab && clicked_job_tab.citizen_ids.any?
+      if clicked_job_tab && clicked_job_tab.citizen_ids.any? && !holding_citizen
         # puts "---> clicked job #{clicked_job_tab.name}"
         PickupCitizenCommand.create(game_id: game_id, citizen_id: clicked_job_tab.citizen_ids.last)
       elsif clicked_job_tab && holding_citizen

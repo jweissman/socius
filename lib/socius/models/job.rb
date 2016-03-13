@@ -13,10 +13,10 @@ module Socius
         name: "farm",
         production: 1,
         food: 3,
-        research: 2,
-        gold: 3,
-        faith: 1,
-        culture: 2
+        research: 0,
+        gold: 0,
+        faith: 0,
+        culture: 0
       )
     end
 

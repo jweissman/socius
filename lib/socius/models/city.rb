@@ -19,9 +19,7 @@ module Socius
         if citizen.job.nil?
           hash
         else
-          # hash ||= {} #??
           job_sym = citizen.job.name.to_sym
-          p [ :citizen_jobs_ids_hash, hash: hash, citizen: citizen ]
           hash[job_sym] ||= []
           hash[job_sym] << citizen.id
           hash
@@ -30,7 +28,6 @@ module Socius
     end
 
     def iteration_event
-      p [ citizen_jobs_ids_hash: citizen_jobs_ids_hash ]
       CityIteratedEvent.create(
         city_id: self.id,
         society_id: society.id,
