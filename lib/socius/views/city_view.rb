@@ -39,7 +39,7 @@ module Socius
                   1 + ((1.0 - progress) * (anim.size-1).to_f).to_i
                 end
         img = anim[frame]
-        img.draw(pos.x,70 + pos.y,1,1,1,growth_meter_color)
+        img.draw(4+pos.x,58 + pos.y,1,1,1,growth_meter_color)
       end
     end
 
