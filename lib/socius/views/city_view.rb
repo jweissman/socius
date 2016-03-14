@@ -7,10 +7,11 @@ module Socius
 
     attr_accessor :city_id, :city_name
     attr_accessor :growth_progress, :starving
-    attr_accessor :location
+    attr_accessor :location, :claimed_territory
 
     has_one :job_tallies_widget
-    def_delegators :job_tallies_widget, :farm_tally, :mine_tally, :pray_tally, :trade_tally, :study_tally, :dream_tally
+    def_delegators :job_tallies_widget,
+      :farm_tally, :mine_tally, :pray_tally, :trade_tally, :study_tally, :dream_tally
 
     after_create { create_job_tallies_widget(origin: coord(160,0)) }
 
@@ -22,12 +23,20 @@ module Socius
       job_tallies_widget.render(window)
     end
 
-    # TODO move widget etc to game view
+    # TODO move widget etc to game view?
     def render_city_view(window, offset:)
       return unless location
-      # p [ :rendering_city, offset: offset, location: location ]
       sz = WorldView::SCALE
       pos = (location*sz).translate(offset)
+
+      color = 0xc0a0a0f0
+      claimed_territory.each do |tile_location|
+        tile_pos = (tile_location*sz).translate(offset)
+        window.draw_quad(tile_pos.x, tile_pos.y, color,
+                         tile_pos.x + sz, tile_pos.y, color,
+                         tile_pos.x, tile_pos.y + sz, color,
+                         tile_pos.x + sz, tile_pos.y + sz, color)
+      end
 
       window.city_image.draw(pos.x, pos.y,2)
       if growth_progress

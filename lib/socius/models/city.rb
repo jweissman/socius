@@ -8,14 +8,35 @@ module Socius
 
     after_create do
       @food_amount = 1_800
-      3.times { create_citizen }
       @location = society.world.tiles.where.grass.all.sample.location
+
+      claim_tile(at: @location)
+      3.times { create_citizen }
+    end
+
+    def claim_tile(at: pick_tile_to_claim)
+      tile_to_claim = society.world.tiles.where.at(at).first
+      tiles << tile_to_claim
+    end
+
+    def lose_tile
+      tiles.reject { |t| t == home_tile }.sample.city_id = nil #destroy
+    end
+
+    def home_tile
+      Tile.where.at(@location).first
+    end
+
+    def pick_tile_to_claim
+      (tiles.flat_map(&:neighbors).uniq - tiles.all).
+        min_by { |t| t.distance_to(home_tile) }.
+        location
     end
 
     def iterate
       if !citizens.any?
-        # TODO we need to destroy this city
-        #      (if it's the capital, the game is over for this player)
+        # TODO if it's the capital, the game is over for this player
+        #      (investigate why this doesn't seem to run?)
         destroy
       else
         growth = citizens.sum(:food)
@@ -63,7 +84,8 @@ module Socius
         citizen_ids_by_job: citizen_jobs_ids_hash,
         growth_progress: growth_progress,
         starving: starving,
-        location: location
+        location: location,
+        claimed_territory: tiles.pluck(:location)
       )
     end
   end
