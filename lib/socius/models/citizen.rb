@@ -6,7 +6,7 @@ module Socius
     belongs_to :city
     belongs_to :job
 
-    after_create { self.job = Job.farmer }
+    after_create { self.job = Job.farmer }  
 
     def production; job&.production || 0 end
     def gold; job&.gold || 0 end

@@ -88,7 +88,7 @@ module Socius
       window.resource_meters_image = Gosu::Image.new("media/resource_meters.png")
       window.socius_logo = Gosu::Image.new("media/socius_logo.png")
       window.player_hand = Gosu::Image.new("media/player_hand.png")
-      window.terrain_tiles = Gosu::Image.new("media/terrain.png")
+      window.terrain_tiles = Gosu::Image.load_tiles("media/terrain.png",64,64) #16,16)
 
       p [ :asset_load_complete, elapsed: (Time.now-t0) ]
     end

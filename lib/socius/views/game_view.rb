@@ -6,10 +6,13 @@ module Socius
     attr_accessor :game_id, :dimensions
     attr_accessor :holding_citizen
 
+    has_one :world_view
     has_one :player_view
+    has_many :city_views, :through => :player_view
 
     def render(window)
-      window.socius_logo.draw(0,552,0)
+      window.socius_logo.draw(0,552,1)
+      world_view.render(window, center: player_view.focused_city_view.location)
       player_view.render(window)
       draw_cursor(window)
     end

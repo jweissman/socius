@@ -1,19 +1,22 @@
 module Socius
   class City < Metacosm::Model
-    attr_accessor :name, :food_amount, :starving
+    attr_accessor :name, :food_amount, :starving, :location
 
     belongs_to :society
     has_many :citizens
+    has_many :tiles
 
     after_create do
       @food_amount = 1_800
       3.times { create_citizen }
+      @location = society.world.tiles.where.grass.all.sample.location
     end
 
     def iterate
       if !citizens.any?
         # TODO we need to destroy this city
         #      (if it's the capital, the game is over for this player)
+        destroy
       else
         growth = citizens.sum(:food)
         @starving = growth < 0
@@ -59,7 +62,8 @@ module Socius
         society_id: society.id,
         citizen_ids_by_job: citizen_jobs_ids_hash,
         growth_progress: growth_progress,
-        starving: starving
+        starving: starving,
+        location: location
       )
     end
   end
