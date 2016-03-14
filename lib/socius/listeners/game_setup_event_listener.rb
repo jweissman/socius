@@ -1,6 +1,6 @@
 module Socius
   class GameSetupEventListener < Metacosm::EventListener
-    def receive(world_id:, game_id:, player_id:, player_name:, city_id:, city_name:)
+    def receive(world_id:, world_map:, game_id:, player_id:, player_name:, city_id:, city_name:)
       game_view = GameView.find_by(game_id: game_id)
 
 
@@ -10,9 +10,8 @@ module Socius
       # start off with focus on capital
       player_view.focused_city_id = city_id
 
-
       # create world view
-      game_view.create_world_view(world_id: world_id)
+      game_view.create_world_view(world_id: world_id, tile_map: world_map)
     end
   end
 end

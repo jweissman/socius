@@ -12,8 +12,19 @@ module Socius
 
     def render(window)
       window.socius_logo.draw(0,552,1)
-      world_view.render(window, center: player_view.focused_city_view.location)
-      player_view.render(window)
+      if player_view&.focused_city_view&.location
+        # TODO move this update into listener?
+        world_view.center = player_view.focused_city_view.location
+        world_view.render(window)
+      else
+        # TODO track current center...?
+        world_view&.render(window)
+      end
+
+      player_view&.render(window)
+
+      window.big_logo.draw(160,100,0) if player_view.nil?
+
       draw_cursor(window)
     end
 
@@ -36,6 +47,10 @@ module Socius
       elsif clicked_job_tab && holding_citizen
         puts "---> clicked to assign job #{clicked_job_tab.name}"
         DropCitizenCommand.create(game_id: game_id, new_job_name: clicked_job_tab.name)
+
+      else # assume we're trying to click to scroll somewhere in the world
+        # need to dereference mouse location...
+        # ScrollToLocationCommand.create(game_id: game_id, location: xy)
       end
     end
 

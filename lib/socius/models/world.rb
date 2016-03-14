@@ -9,17 +9,15 @@ module Socius
     has_many :cities, :through => :societies
     has_many :tiles
 
-    before_create :ensure_dimensions_exist
+    # before_create :ensure_dimensions_exist
     after_create :build_tiles
 
     def iterate
       societies.each(&:iterate)
-      emit(iteration_event)
     end
 
-    protected
-    def iteration_event
-      WorldIteratedEvent.create(
+    def creation_event
+      WorldCreatedEvent.create(
         world_id: self.id,
         tile_map: tile_map
       )
@@ -34,15 +32,18 @@ module Socius
     end
 
     private
-    def ensure_dimensions_exist
-      @dimensions = dim(20,20)
-    end
+    # def ensure_dimensions_exist
+    # end
 
     def build_tiles
+      t0 = Time.now
+      raise "Dimensions must exist (and be a dimensions obj)!" unless dimensions && dimensions.is_a?(Geometer::Dimensions)
+      p [ :building_tiles ]
       dimensions.all_locations.each do |xy|
         terrain = rand > 0.1 ? 'grass' : 'water'
         create_tile(location: xy, terrain: terrain)
       end
+      p [ :tiles_built, elapsed: Time.now - t0 ]
     end
   end
 end

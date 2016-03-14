@@ -1,20 +1,18 @@
 module Socius
-  # wrap around a window
   class GameController < Struct.new(:window)
     include Geometer::PointHelpers
-
-    # current citizen id selected
-    # whether we are even in 'drag citizen' mode at all
-
-    # scale of the map?
-    SCALE = 16
+    include Geometer::DimensionHelpers
 
     def prepare(headless)
       @headless = headless
 
       window.caption = "Socius #{Socius::VERSION}"
       prepare_assets unless headless?
-      conduct_sim
+
+      simulation.conduct!
+      simulation.fire(create_game)
+      simulation.fire(setup_game)
+
       self
     end
 
@@ -32,45 +30,18 @@ module Socius
 
     def button_down(id)
       if id == Gosu::MsLeft then
-        # TODO include geometer and point helpers
-        command = game_view.clicked at: mouse_position
-        if command
-          simulation.fire(command)
-        end
+        click!
+      end
+    end
+
+    def click!
+      command = game_view.clicked at: mouse_position
+      if command
+        simulation.fire(command)
       end
     end
 
     protected
-    def mouse_position
-      coord(window.mouse_x, window.mouse_y)
-    end
-
-    def headless?
-      @headless == true
-    end
-
-    def conduct_sim
-      simulation.apply(create_game)
-      simulation.apply(setup_game)
-      simulation.conduct!
-    end
-
-    def create_game
-      CreateGameCommand.create(
-        game_id: game_id,
-        dimensions: [(window.width/SCALE).to_i, (window.height/SCALE).to_i]
-      )
-    end
-
-    def setup_game
-      SetupGameCommand.create(game_id: game_id, player_id: SecureRandom.uuid, city_id: SecureRandom.uuid, player_name: "Joe", city_name: "Cerulean City")
-    end
-
-    private
-    def game_id
-      @game_id ||= SecureRandom.uuid
-    end
-
     def prepare_assets
       t0 = Time.now
       p [ :loading_assets ]
@@ -90,8 +61,32 @@ module Socius
       window.player_hand = Gosu::Image.new("media/player_hand.png")
       window.terrain_tiles = Gosu::Image.load_tiles("media/terrain.png",64,64) #16,16)
 
+      window.big_logo = Gosu::Image.new("media/big_logo.png")
+
       p [ :asset_load_complete, elapsed: (Time.now-t0) ]
     end
+
+    def mouse_position
+      coord(window.mouse_x, window.mouse_y)
+    end
+
+    def headless?
+      @headless == true
+    end
+
+    def create_game
+      CreateGameCommand.create(game_id: game_id, dimensions: dim( 40, 40 ))
+    end
+
+    def setup_game
+      SetupGameCommand.create(game_id: game_id, player_id: SecureRandom.uuid, city_id: SecureRandom.uuid, player_name: "Joe", city_name: "Cerulean City")
+    end
+
+    private
+    def game_id
+      @game_id ||= SecureRandom.uuid
+    end
+
 
     def simulation
       @sim ||= Metacosm::Simulation.current

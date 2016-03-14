@@ -8,7 +8,7 @@ module Socius
 
     after_create do
       @food_amount = 1_800
-      @location = society.world.tiles.where.grass.all.sample.location
+      @location ||= society.world.tiles.where.grass.all.sample.location
 
       claim_tile(at: @location)
       3.times { create_citizen }
@@ -21,16 +21,6 @@ module Socius
 
     def lose_tile
       tiles.reject { |t| t == home_tile }.sample.city_id = nil #destroy
-    end
-
-    def home_tile
-      Tile.where.at(@location).first
-    end
-
-    def pick_tile_to_claim
-      (tiles.flat_map(&:neighbors).uniq - tiles.all).
-        min_by { |t| t.distance_to(home_tile) }.
-        location
     end
 
     def iterate
@@ -56,6 +46,16 @@ module Socius
     end
 
     protected
+    def home_tile
+      Tile.where.at(@location).first
+    end
+
+    def pick_tile_to_claim
+      (tiles.flat_map(&:neighbors).uniq - tiles.all).
+        min_by { |t| t.distance_to(home_tile) }.
+        location
+    end
+
     def citizen_jobs_ids_hash
       citizens.all.inject({}) do |hash,citizen|
         if citizen.job.nil?

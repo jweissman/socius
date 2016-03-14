@@ -10,7 +10,8 @@ describe Socius do
 end
 
 describe World do
-  subject(:world) { World.create(name: "Ea") }
+  include Geometer::DimensionHelpers
+  subject(:world) { World.create(name: "Ea", dimensions: dim(2,2)) }
 
   it 'should have a name' do
     expect(world.name).to eq("Ea")
@@ -25,12 +26,14 @@ describe Society do
 end
 
 describe CreateGameCommand do
+  include Geometer::DimensionHelpers
+
   subject(:create_game_command) do
-    CreateGameCommand.create(game_id: 'game_id', dimensions: 'dimensions')
+    CreateGameCommand.create(game_id: 'game_id', dimensions: dim(10,10))
   end
 
   let(:game_created_event) do
-    GameCreatedEvent.create(game_id: 'game_id', dimensions: 'dimensions')
+    GameCreatedEvent.create(game_id: 'game_id', dimensions: dim(10,10))
   end
 
   it 'should trigger game creation' do
