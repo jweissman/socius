@@ -35,7 +35,7 @@ module Socius
     end
 
     def click!
-      command = game_view.clicked at: mouse_position
+      command = game_view.clicked(window, at: mouse_position)
       if command
         simulation.fire(command)
       end

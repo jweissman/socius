@@ -37,5 +37,9 @@ module Socius
 
       emit(CitizenDroppedEvent.create(game_id: self.id))
     end
+
+    def scroll(location)
+      emit(PlayerScrolledEvent.create(game_id: self.id, location: location))
+    end
   end
 end

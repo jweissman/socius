@@ -28,22 +28,22 @@ module Socius
       draw_cursor(window)
     end
 
-    def draw_cursor(window)
+    def draw_cursor(window, debug: false)
       mouse = mouse_position(window)
       window.cursor.draw(mouse.x, mouse.y,2)
-
-      if world_view && world_view.center
-        tile_location = world_view.dereference_map_location_from_screen_position(mouse, window: window)
-        window.font.draw(tile_location.to_s, 10, 10, 1)
-      end
 
       if holding_citizen
         window.citizen_image.draw(mouse.x, mouse.y, 3)
       end
+
+      if debug && world_view && world_view.center
+        tile_location = world_view.dereference_map_location_from_screen_position(mouse, window: window)
+        window.font.draw(tile_location.to_s, 10, 10, 1)
+      end
     end
 
-    def clicked(at:)
-      clicked_job_tab = city_job_menu.detect do |tab, rect|
+    def clicked(window, at:)
+      clicked_job_tab = player_view.focused_city_id && city_job_menu.detect do |tab, rect|
         rect.contains?(at)
       end&.first
 
@@ -56,7 +56,10 @@ module Socius
 
       else # assume we're trying to click to scroll somewhere in the world
         # need to dereference mouse location...
-        # ScrollToLocationCommand.create(game_id: game_id, location: xy)
+        mouse = mouse_position(window)
+        map_location = world_view.dereference_map_location_from_screen_position(mouse, window: window)
+
+        ScrollToLocationCommand.create(game_id: game_id, location: map_location)
       end
     end
 
