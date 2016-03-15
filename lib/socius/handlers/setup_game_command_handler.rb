@@ -1,8 +1,9 @@
 module Socius
   class SetupGameCommandHandler
-    def handle(game_id:, player_id:, city_id:, player_name:, city_name:)
-      game = Game.find(game_id)
+    def handle(dimensions:, game_id:, player_id:, city_id:, player_name:, city_name:)
+      game = Game.create(id: game_id)
       game.setup(
+        dimensions: dimensions,
         player_name: player_name,
         city_name: city_name,
         player_id: player_id,

@@ -5,14 +5,12 @@ module Socius
 
     def prepare(headless)
       @headless = headless
-
+      GameView.create(game_id: game_id)
       window.caption = "Socius #{Socius::VERSION}"
       prepare_assets unless headless?
 
       simulation.conduct!
-      simulation.fire(create_game)
       simulation.fire(setup_game)
-
       self
     end
 
@@ -74,19 +72,18 @@ module Socius
       @headless == true
     end
 
-    def create_game
-      CreateGameCommand.create(game_id: game_id, dimensions: dim( 40, 40 ))
+    def setup_game
+      SetupGameCommand.create(game_id: game_id, player_id: SecureRandom.uuid, city_id: SecureRandom.uuid, player_name: "Joe", city_name: "Cerulean City", dimensions: default_dimensions)
     end
 
-    def setup_game
-      SetupGameCommand.create(game_id: game_id, player_id: SecureRandom.uuid, city_id: SecureRandom.uuid, player_name: "Joe", city_name: "Cerulean City")
+    def default_dimensions
+      dim(50,50)
     end
 
     private
     def game_id
       @game_id ||= SecureRandom.uuid
     end
-
 
     def simulation
       @sim ||= Metacosm::Simulation.current

@@ -1,8 +1,8 @@
 module Socius
   class GameSetupEventListener < Metacosm::EventListener
-    def receive(world_id:, world_map:, game_id:, player_id:, player_name:, city_id:, city_name:)
-      game_view = GameView.find_by(game_id: game_id)
-
+    def receive(world_id:, world_map:, game_id:, player_id:, player_name:, city_id:, city_name:, game_dimensions:)
+      game_view = GameView.where(game_id: game_id).first_or_create
+      game_view.update(dimensions: game_dimensions)
 
       player_view = game_view.create_player_view(player_id: player_id, name: player_name)
       player_view.create_city_view(city_id: city_id, city_name: city_name)

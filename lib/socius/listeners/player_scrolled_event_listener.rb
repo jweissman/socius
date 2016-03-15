@@ -2,10 +2,8 @@ module Socius
   class PlayerScrolledEventListener < Metacosm::EventListener
     def receive(game_id:, location:)
       game_view = GameView.find_by(game_id: game_id)
-
       game_view.world_view.update(center: location)
 
-      # try to find city view at location
       city_view = game_view.city_views.all.detect do |view|
         view.location == location
       end

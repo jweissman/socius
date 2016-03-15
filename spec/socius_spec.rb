@@ -25,33 +25,14 @@ describe Society do
   end
 end
 
-describe CreateGameCommand do
-  include Geometer::DimensionHelpers
-
-  subject(:create_game_command) do
-    CreateGameCommand.create(game_id: 'game_id', dimensions: dim(10,10))
-  end
-
-  let(:game_created_event) do
-    GameCreatedEvent.create(game_id: 'game_id', dimensions: dim(10,10))
-  end
-
-  it 'should trigger game creation' do
-    expect(create_game_command).to trigger_events(game_created_event)
-  end
-end
-
 describe TickCommand do
+  include Geometer::DimensionHelpers
   subject(:tick_command) do
     TickCommand.create(game_id: 'game_id')
   end
 
   let(:setup_game_command) do
-    SetupGameCommand.create(game_id: 'game_id', player_id: 'player_id', player_name: 'Thomas', city_name: 'London', city_id: 'city_id')
-  end
-
-  let(:create_game_command) do
-    CreateGameCommand.create(game_id: 'game_id', dimensions: 'dimensions')
+    SetupGameCommand.create(game_id: 'game_id', player_id: 'player_id', player_name: 'Thomas', city_name: 'London', city_id: 'city_id', dimensions: dim(10,10))
   end
 
   let(:society_iterated_event) {
@@ -74,7 +55,6 @@ describe TickCommand do
   let(:sim) { Metacosm::Simulation.current }
 
   before do
-    sim.apply create_game_command
     sim.apply setup_game_command
   end
 
