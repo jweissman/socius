@@ -35,6 +35,15 @@ module Socius
       end
     end
 
+    def dereference_map_location_from_screen_position(pos, window:)
+      sz = SCALE
+      screen_center = coord(window.width/2,window.height/2)
+      offset = screen_center.translate(-center*sz)
+
+      dereferenced = pos.translate(-offset) / sz
+      dereferenced.to_i
+    end
+
     def visible_tiles(center)
       @visible_tile_set ||= {}
       @visible_tile_set[center] ||= compute_visible_tiles_for(center)

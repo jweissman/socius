@@ -1,5 +1,7 @@
 # socius
+![demo gif](https://github.com/jweissman/socius/blob/master/media/demo.gif)
 
+# original mockup
 ![socius mockup](https://raw.githubusercontent.com/jweissman/socius/master/media/mockup.png)
 
 * [Homepage](https://rubygems.org/gems/socius)

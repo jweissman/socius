@@ -31,6 +31,12 @@ module Socius
     def draw_cursor(window)
       mouse = mouse_position(window)
       window.cursor.draw(mouse.x, mouse.y,2)
+
+      if world_view && world_view.center
+        tile_location = world_view.dereference_map_location_from_screen_position(mouse, window: window)
+        window.font.draw(tile_location.to_s, 10, 10, 1)
+      end
+
       if holding_citizen
         window.citizen_image.draw(mouse.x, mouse.y, 3)
       end
