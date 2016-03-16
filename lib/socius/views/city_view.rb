@@ -19,26 +19,28 @@ module Socius
     has_many   :job_views, :through => :job_tallies_widget
 
     def render_job_tallies_widget(window)
-      # TODO if focused...
       job_tallies_widget.render(window)
     end
 
-    # TODO move widget etc to game view?
     def render_city_view(window, offset:)
       return unless location
+
       sz = WorldView::SCALE
       pos = (location*sz).translate(offset)
 
-      color = 0xc0a0a0f0
-      claimed_territory.each do |tile_location|
-        tile_pos = (tile_location*sz).translate(offset)
-        window.draw_quad(tile_pos.x, tile_pos.y, color,
-                         tile_pos.x + sz, tile_pos.y, color,
-                         tile_pos.x, tile_pos.y + sz, color,
-                         tile_pos.x + sz, tile_pos.y + sz, color)
+      if claimed_territory
+        color = player_view.color
+        claimed_territory.each do |tile_location|
+          tile_pos = (tile_location*sz).translate(offset)
+          window.draw_quad(tile_pos.x, tile_pos.y, color,
+                           tile_pos.x + sz, tile_pos.y, color,
+                           tile_pos.x, tile_pos.y + sz, color,
+                           tile_pos.x + sz, tile_pos.y + sz, color, 
+                          ZOrder::TileOverlay)
+        end
       end
 
-      window.city_image.draw(pos.x, pos.y,2)
+      window.city_image.draw(pos.x, pos.y,ZOrder::MapSprites)
       if growth_progress
         anim = window.growth_meter_animation
         progress = growth_progress
@@ -48,7 +50,8 @@ module Socius
                   1 + ((1.0 - progress) * (anim.size-1).to_f).to_i
                 end
         img = anim[frame]
-        img.draw(4+pos.x,58 + pos.y,1,1,1,growth_meter_color)
+        img.draw(4+pos.x,58 + pos.y,ZOrder::MapSprites,
+                 1,1,growth_meter_color)
       end
     end
 

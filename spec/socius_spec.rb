@@ -39,8 +39,8 @@ describe TickCommand do
     SocietyIteratedEvent.create(
       society_id: society.id, player_id: 'player_id',
       resources: {
-        production: 0, production_progress: 0.01 * citizen_count,
-        gold: 0,  gold_progress: 0.01 * citizen_count,
+        production: 0, production_progress: 0.00,
+        gold: 0,  gold_progress: 0.00,
         research: 0, research_progress: 0.0,
         faith: 0, faith_progress: 0.0,
         culture: 0, culture_progress: 0.0
@@ -72,15 +72,16 @@ describe GameController do
   subject(:game_controller) { GameController.new(window) }
   let(:window)              { instance_double(Gosu::Window, mouse_x: 0, mouse_y: 0) }
   let(:left_mouse_btn)      { Gosu::MsLeft }
-  let(:game_view)           { instance_spy(GameView, :clicked => command) }
+  let(:game_view)           { instance_spy(GameView) }
   let(:command)             { :some_command }
   let(:sim)                 { instance_double(Metacosm::Simulation) }
 
-  it 'should fire commands on clicks' do
+  it 'should trigger game view processing on clicks' do
     allow(game_controller).to receive(:game_view).and_return(game_view)
     allow(game_controller).to receive(:simulation).and_return(sim)
+    allow(game_view).to receive(:command_for_click).once.and_return(command)
 
-    expect(sim).to receive(:fire).with(command)
+    expect(sim).to receive(:apply).with(command)
 
     game_controller.button_down(left_mouse_btn)
   end

@@ -8,7 +8,9 @@ module Socius
 
     after_create do
       @food_amount = 1_800
-      @location ||= society.world.tiles.where.grass.all.sample.location
+
+      available_site = society.world.random_available_new_city_site
+      @location ||= available_site
 
       claim_tile(at: @location)
       3.times { create_citizen }
@@ -31,13 +33,13 @@ module Socius
       else
         growth = citizens.sum(:food)
         @starving = growth < 0
-
         @food_amount += growth
-        if @food_amount >= food_required_to_grow
-          @food_amount -= food_required_to_grow
+        to_grow = food_required_to_grow
+        if @food_amount >= to_grow
+          @food_amount -= to_grow
           create_citizen
         elsif @food_amount < 0
-          @food_amount = (food_required_to_grow / 2.0).to_i
+          @food_amount = (to_grow / 2.0).to_i
           citizens.last.destroy
         end
       end
@@ -51,7 +53,7 @@ module Socius
     end
 
     def pick_tile_to_claim
-      (tiles.flat_map(&:neighbors).uniq - tiles.all).
+      (tiles.flat_map(&:neighbors).uniq - tiles.all - society.world.claimed_tiles).
         min_by { |t| t.distance_to(home_tile) }.
         location
     end
@@ -74,13 +76,16 @@ module Socius
     end
 
     def food_required_to_grow
-      1_200 + ((5*citizens.count) ** 2)
+      2_000 + ((20*citizens.count) ** 2)
     end
 
     def iteration_event
       CityIteratedEvent.create(
         city_id: self.id,
         society_id: society.id,
+        player_id: society.player.id,
+        player_color: society.player.color,
+        game_id: society.player.game.id,
         citizen_ids_by_job: citizen_jobs_ids_hash,
         growth_progress: growth_progress,
         starving: starving,

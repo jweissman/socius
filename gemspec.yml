@@ -7,7 +7,7 @@ email: jweissman1986@gmail.com
 homepage: https://rubygems.org/gems/socius
 
 development_dependencies:
-  bundler: ~> 1.10
+  bundler: ~> 1.9
   codeclimate-test-reporter: ~> 0.1
   cucumber: ~> 0.10.2
   rake: ~> 10.0

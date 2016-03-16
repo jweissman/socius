@@ -6,8 +6,8 @@ module Socius
     belongs_to :world
     belongs_to :city
 
-    def distance_to(other_tile)
-      dist(location, other_tile.location)
+    def distance_to(entity)
+      dist(location, entity.location)
     end
 
     def neighbors
@@ -21,6 +21,10 @@ module Socius
 
     def self.grass
       where(terrain: 'grass')
+    end
+
+    def grass?
+      terrain == 'grass'
     end
   end
 end

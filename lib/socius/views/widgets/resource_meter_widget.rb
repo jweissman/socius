@@ -8,7 +8,7 @@ module Socius
     after_create :create_meters
 
     def render(window)
-      window.resource_meters_image.draw(origin.x,origin.y,0)
+      window.resource_meters_image.draw(origin.x,origin.y,ZOrder::UI)
       resource_meter_views.each do |resource_meter_view|
         resource_meter_view.render(window)
       end

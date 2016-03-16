@@ -1,5 +1,6 @@
 module Socius
   class CitizenDroppedEvent < Metacosm::Event
-    attr_accessor :game_id
+    # TODO needs player_id...
+    attr_accessor :game_id, :player_id
   end
 end

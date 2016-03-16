@@ -9,7 +9,7 @@ module Socius
     after_create :create_job_views
 
     def render(window)
-      window.job_view_menu_image.draw(origin.x,origin.y,0)
+      window.job_view_menu_image.draw(origin.x,origin.y,ZOrder::UI)
 
       job_views.each do |job_view|
         job_view.render(window)

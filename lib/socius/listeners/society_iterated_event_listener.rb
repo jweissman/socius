@@ -1,8 +1,9 @@
 module Socius
   class SocietyIteratedEventListener < Metacosm::EventListener
     def receive(society_id:, player_id:, resources:)
-      player_view = PlayerView.find_by(player_id: player_id)
-      update_resource_meters(player_view, resources)
+      # p [ :society_iterated, player_id: player_id, resources: resources ]
+      player_view = PlayerView.find_by(player_id: player_id) #.first_or_create # ??
+      update_resource_meters(player_view, resources) if player_view
     end
 
     def update_resource_meters(player_view,
@@ -17,6 +18,7 @@ module Socius
                                faith:,
                                faith_progress:)
 
+      # p [ :updating_player_view, player_view ]
       player_view.gold_meter.
         update(progress: gold_progress, resource_count: gold)
 

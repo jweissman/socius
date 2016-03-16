@@ -16,6 +16,8 @@ Civlike + cards
 
 ## Features
 
+  - Multiplayer game server (`sociusd`)
+
 ## Examples
 
     require 'socius'

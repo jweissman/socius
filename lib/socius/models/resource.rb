@@ -6,7 +6,7 @@ module Socius
 
     def aggregate
       if @amount < Society::RESOURCE_LIMIT
-        @progress += growth
+        @progress += growth if growth
         if @progress >= step_increment
           @amount += 1
           @progress -= step_increment

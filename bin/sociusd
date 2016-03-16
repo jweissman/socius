@@ -6,15 +6,10 @@ if File.directory?(File.join(root,'.git'))
     begin
       require 'bundler/setup'
       require 'socius'
-      require 'tty-prompt'
-      puts "=== SOCIUS #{Socius::VERSION} ==="
+      require 'socius/server'
 
-      prompt = TTY::Prompt.new
-      player_name = prompt.ask('What is your name?')
-      multiplayer = prompt.yes?('Would you like to play multiplayer?')
-
-      window = Socius::GameWindow.new(player_name: player_name, multiplayer: multiplayer)
-      window.show
+      server = Socius::GameServer.new
+      server.boot!
     rescue LoadError => e
       warn e.message
       warn "Run `gem install bundler` to install Bundler"

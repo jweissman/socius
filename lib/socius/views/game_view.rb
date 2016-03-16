@@ -4,76 +4,56 @@ module Socius
     include Geometer::DimensionHelpers
 
     attr_accessor :game_id, :dimensions
-    attr_accessor :holding_citizen
 
-    has_one :world_view
-    has_one :player_view
-    has_many :city_views, :through => :player_view
+    has_many :player_views
+    has_many :city_views, :through => :player_views
 
-    def render(window)
-      window.socius_logo.draw(0,552,1)
-      if player_view&.focused_city_view&.location
-        # TODO move this update into listener?
-        world_view.center = player_view.focused_city_view.location
-        world_view.render(window)
+    def render(window, player_id:)
+      player_view = player_views.where(player_id: player_id).first
+      if player_view
+        player_view.render(window) unless player_view.nil? # ?
       else
-        # TODO track current center...?
-        world_view&.render(window)
+        window.big_logo.draw(160,100,ZOrder::Background)
       end
 
-      player_view&.render(window)
-
-      window.big_logo.draw(160,100,0) if player_view.nil?
-
-      draw_cursor(window)
+      window.socius_logo.draw(0,552,ZOrder::UIOverlay)
     end
 
-    def draw_cursor(window, debug: false)
+    # TODO move this onto player view?
+    def command_for_click(window, at:, player_id:)
+      p [ :game_view_click, at: at, player_id: player_id ]
+
+      player_view = player_views.where(player_id: player_id).first
+
+      if player_view && player_view.focused_city_view
+        city_job_menu = player_view.focused_city_view.job_view_bounding_boxes
+        clicked_job_tab = player_view.focused_city_id && city_job_menu.detect do |tab, rect|
+          rect.contains?(at)
+        end
+
+        if clicked_job_tab && clicked_job_tab.first.citizen_ids.any? && !player_view.holding_citizen
+          cmd = PickupCitizenCommand.create(game_id: game_id, citizen_id: clicked_job_tab.first.citizen_ids.last, player_id: player_id)
+          p [ :pickup_citizen!, command: cmd ]
+          return cmd
+
+        elsif clicked_job_tab && player_view.holding_citizen
+          p [ :drop_citizen! ]
+          cmd = (DropCitizenCommand.create(game_id: game_id, new_job_name: clicked_job_tab.first.name, player_id: player_id))
+          return cmd
+        else
+          # drop out...
+        end
+      end
+
       mouse = mouse_position(window)
-      window.cursor.draw(mouse.x, mouse.y,2)
-
-      if holding_citizen
-        window.citizen_image.draw(mouse.x, mouse.y, 3)
-      end
-
-      if debug && world_view && world_view.center
-        tile_location = world_view.dereference_map_location_from_screen_position(mouse, window: window)
-        window.font.draw(tile_location.to_s, 10, 10, 1)
-      end
-    end
-
-    def clicked(window, at:)
-      clicked_job_tab = player_view.focused_city_id && city_job_menu.detect do |tab, rect|
-        rect.contains?(at)
-      end&.first
-
-      if clicked_job_tab && clicked_job_tab.citizen_ids.any? && !holding_citizen
-        # puts "---> clicked job #{clicked_job_tab.name}"
-        PickupCitizenCommand.create(game_id: game_id, citizen_id: clicked_job_tab.citizen_ids.last)
-      elsif clicked_job_tab && holding_citizen
-        puts "---> clicked to assign job #{clicked_job_tab.name}"
-        DropCitizenCommand.create(game_id: game_id, new_job_name: clicked_job_tab.name)
-
-      else # assume we're trying to click to scroll somewhere in the world
-        # need to dereference mouse location...
-        mouse = mouse_position(window)
-        map_location = world_view.dereference_map_location_from_screen_position(mouse, window: window)
-
-        ScrollToLocationCommand.create(game_id: game_id, location: map_location)
-      end
+      map_location = player_view && player_view.world_view && player_view.world_view.dereference_map_location_from_screen_position(mouse, window: window) rescue nil
+      p [ :scroll!, location: map_location ]
+      return(ScrollToLocationCommand.create(game_id: game_id, location: map_location, player_id: player_id)) if map_location
     end
 
     protected
     def mouse_position(window)
       coord(window.mouse_x, window.mouse_y)
-    end
-
-    def focused_city_view
-      player_view.focused_city_view
-    end
-
-    def city_job_menu
-      focused_city_view.job_view_bounding_boxes
     end
   end
 end

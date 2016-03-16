@@ -17,7 +17,7 @@ module Socius
           x = x0 + i * 24
           y = y0
 
-          full_cell.draw(x,y-1,1,1,1,color)
+          full_cell.draw(x,y-1,ZOrder::UIOverlay,1,1,color)
         end
       end
 
@@ -31,7 +31,7 @@ module Socius
 
         img = anim[frame]
         x,y = x0 + resource_count*24, y0
-        img.draw(x,y,1,1,1,color)
+        img.draw(x,y,ZOrder::UIOverlay,1,1,color)
       end
     end
   end

@@ -1,17 +1,20 @@
 module Socius
-  class GameController < Struct.new(:window)
+  class GameController < Struct.new(:window, :player_name)
     include Geometer::PointHelpers
     include Geometer::DimensionHelpers
 
     def prepare(headless)
       @headless = headless
-      GameView.create(game_id: game_id)
       window.caption = "Socius #{Socius::VERSION}"
       prepare_assets unless headless?
+      prepare_sim_and_view
+      self
+    end
 
+    def prepare_sim_and_view
+      GameView.create(game_id: game_id)
       simulation.conduct!
       simulation.fire(setup_game)
-      self
     end
 
     def update
@@ -22,8 +25,19 @@ module Socius
       if headless?
         puts "WARNING: asked game controller to #draw while headless (which is a no-op)"
       else
-        game_view.render(window) if game_view
+        # p [ :drawing, game_view: game_view ]
+        # t0 = Time.now
+        if game_view
+          game_view.render(window, player_id: active_player_id) 
+        else
+          empty_game_view.render(window, player_id: active_player_id)
+        end
+        # p [ :render_complete, elapsed: Time.now - t0 ]
       end
+    end
+
+    def empty_game_view
+      @empty_view ||= GameView.create
     end
 
     def button_down(id)
@@ -33,10 +47,11 @@ module Socius
     end
 
     def click!
-      command = game_view.clicked(window, at: mouse_position)
-      if command
-        simulation.fire(command)
-      end
+      return unless game_view
+      # p [ :simulation, simulation ]
+      # binding.pry
+      cmd = game_view.command_for_click(window, at: mouse_position, player_id: active_player_id) #, sim: simulation)bbbb
+      simulation.apply(cmd) if cmd
     end
 
     protected
@@ -44,7 +59,7 @@ module Socius
       t0 = Time.now
       p [ :loading_assets ]
       window.font = Gosu::Font.new(20)
-      # window.background_image = Gosu::Image.new("media/mockup.png")
+
       window.production_cell_animation = Gosu::Image::load_tiles("media/production_cell.png", 32, 32)
       window.citizen_image = Gosu::Image.new("media/citizen.png")
 
@@ -73,24 +88,23 @@ module Socius
     end
 
     def setup_game
-      SetupGameCommand.create(game_id: game_id, player_id: SecureRandom.uuid, city_id: SecureRandom.uuid, player_name: "Joe", city_name: "Cerulean City", dimensions: default_dimensions)
+      SetupGameCommand.create(game_id: game_id, player_id: active_player_id, city_id: SecureRandom.uuid, player_name: player_name, city_name: "Cerulean City", dimensions: World.standard_dimensions)
     end
 
-    def default_dimensions
-      dim(50,50)
+    def active_player_id
+      @active_player_id ||= SecureRandom.uuid
     end
 
-    private
+    def game_view
+      GameView.find_by(game_id: game_id)
+    end
+
     def game_id
       @game_id ||= SecureRandom.uuid
     end
 
     def simulation
       @sim ||= Metacosm::Simulation.current
-    end
-
-    def game_view
-      GameView.find_by(game_id: game_id)
     end
   end
 end

@@ -11,10 +11,10 @@ module Socius
     def self.farmer
       @farmer ||= Job.create(
         name: "farm",
-        production: 1,
-        food: 5,
+        production: 0,
+        food: 2,
         research: 0,
-        gold: 1,
+        gold: 0,
         faith: 0,
         culture: 0
       )

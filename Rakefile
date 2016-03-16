@@ -1,5 +1,4 @@
 # encoding: utf-8
-
 require 'rubygems'
 
 begin
@@ -21,7 +20,7 @@ task :test    => :spec
 task :default => :spec
 
 require 'yard'
-YARD::Rake::YardocTask.new  
+YARD::Rake::YardocTask.new
 task :doc => :yard
 
 require 'cucumber/rake/task'
