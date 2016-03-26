@@ -25,14 +25,11 @@ module Socius
       if headless?
         puts "WARNING: asked game controller to #draw while headless (which is a no-op)"
       else
-        # p [ :drawing, game_view: game_view ]
-        # t0 = Time.now
         if game_view
           game_view.render(window, player_id: active_player_id) 
         else
           empty_game_view.render(window, player_id: active_player_id)
         end
-        # p [ :render_complete, elapsed: Time.now - t0 ]
       end
     end
 
@@ -48,8 +45,6 @@ module Socius
 
     def click!
       return unless game_view
-      # p [ :simulation, simulation ]
-      # binding.pry
       cmd = game_view.command_for_click(window, at: mouse_position, player_id: active_player_id) #, sim: simulation)bbbb
       simulation.apply(cmd) if cmd
     end

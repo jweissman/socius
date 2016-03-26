@@ -13,10 +13,9 @@ module Socius
       player_view = game_view.create_player_view(player_id: player_id, name: player_name, color: player_color)
 
       player_view.create_world_view(world_id: world_id, tile_map: world_map)
-
       player_view.create_city_view(city_id: city_id, city_name: city_name, location: city_location)
+
       p [ :creating_city_view, city_id: city_id, city_location: city_location ]
-      # player_view.focused_city_id = city_id
 
       fire(ScrollToLocationCommand.create(player_id: player_id, game_id: game_id, location: city_location))
     end
