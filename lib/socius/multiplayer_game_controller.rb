@@ -3,7 +3,7 @@ module Socius
     def game_view
       @game_view ||= GameView.find_by(player_views: { player_id: active_player_id })
     end
-     
+
     def update
       simulation.fire(ping) unless game_view.nil?
     end
@@ -23,8 +23,8 @@ module Socius
 
     def ping
       PingCommand.create(
-        player_name: player_name, 
-        player_id: active_player_id, 
+        player_name: player_name,
+        player_id: active_player_id,
         game_id: game_view.game_id
       )
     end

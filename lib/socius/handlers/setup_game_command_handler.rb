@@ -10,6 +10,7 @@ module Socius
         player_id: player_id,
         city_id: city_id
       )
+      game.drive! unless game.driving
     end
   end
 end

@@ -12,7 +12,7 @@ module Socius
       @farmer ||= Job.create(
         name: "farm",
         production: 0,
-        food: 2,
+        food: 3,
         research: 0,
         gold: 0,
         faith: 0,

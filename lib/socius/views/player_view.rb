@@ -18,11 +18,13 @@ module Socius
       :gold_meter, :research_meter, :production_meter, :faith_meter, :culture_meter
 
     def render(window)
-      world_view.render(window)
-      resource_meter_widget.render(window)
+      if world_view
+        world_view.render(window)
+        resource_meter_widget.render(window)
 
-      focused_city_view.render_job_tallies_widget(window) if focused_city_id
-      window.player_hand.draw(268,418,3)
+        focused_city_view.render_job_tallies_widget(window) if focused_city_id
+        window.player_hand.draw(268,418,3)
+      end
       draw_cursor(window)
     end
 

@@ -18,7 +18,6 @@ module Socius
     end
 
     def update
-      simulation.fire(TickCommand.create(game_id: game_id))
     end
 
     def draw
@@ -26,7 +25,7 @@ module Socius
         puts "WARNING: asked game controller to #draw while headless (which is a no-op)"
       else
         if game_view
-          game_view.render(window, player_id: active_player_id) 
+          game_view.render(window, player_id: active_player_id)
         else
           empty_game_view.render(window, player_id: active_player_id)
         end

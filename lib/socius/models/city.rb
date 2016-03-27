@@ -7,7 +7,7 @@ module Socius
     has_many :tiles
 
     after_create do
-      @food_amount = 1_800
+      @food_amount = 1_000
 
       available_site = society.world.random_available_new_city_site
       @location ||= available_site
@@ -76,7 +76,7 @@ module Socius
     end
 
     def food_required_to_grow
-      2_000 + ((20*citizens.count) ** 2)
+      1_000 + ((5*citizens.count) ** 2)
     end
 
     def iteration_event

@@ -8,7 +8,7 @@ module Socius
 
     after_create { @ticks=0 }
 
-    STEP_LENGTH_IN_TICKS = 100
+    STEP_LENGTH_IN_TICKS = 25
 
     def dimensions
       world.dimensions
