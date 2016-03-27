@@ -58,7 +58,13 @@ module Socius
     #      really should think about sagas (one for the whole game at least,
     #      since it might be a natural place to process win conditions...)
     def drive!
-      @driver = Thread.new { tick while true }
+      @driver = Thread.new do
+        while true
+          tick
+          sleep 0.1
+          Thread.pass
+        end
+      end
       @driving = true
     end
 
