@@ -4,7 +4,9 @@ module Socius
       @game_view ||= GameView.find_by(player_views: { player_id: active_player_id })
     end
      
-    def update; end
+    def update
+      simulation.fire(ping) unless game_view.nil?
+    end
 
     def prepare_sim_and_view
       simulation.conduct!
@@ -17,6 +19,14 @@ module Socius
 
     def play_multiplayer_game
       PlayMultiplayerGameCommand.create(player_name: player_name, player_id: active_player_id)
+    end
+
+    def ping
+      PingCommand.create(
+        player_name: player_name, 
+        player_id: active_player_id, 
+        game_id: game_view.game_id
+      )
     end
   end
 

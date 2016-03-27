@@ -62,10 +62,13 @@ module Socius
         while true
           tick
           sleep 0.1
-          Thread.pass
         end
       end
       @driving = true
+    end
+
+    def ping(player_name, player_id, time)
+      p [ :got_pinged, by: player_name, id: player_id, time: time   ]
     end
 
     def pickup(citizen, player_id:)

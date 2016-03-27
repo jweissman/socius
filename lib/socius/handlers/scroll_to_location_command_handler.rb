@@ -1,5 +1,5 @@
 module Socius
-  class ScrollToLocationCommandHandler < Metacosm::Command
+  class ScrollToLocationCommandHandler
     def handle(game_id:, player_id:, location:)
       game = Game.find(game_id)
       game.scroll(location, player_id)
