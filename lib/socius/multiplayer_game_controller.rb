@@ -36,9 +36,6 @@ module Socius
     end
 
     def redis_connection
-      # p [ :remote_game_redis_conn ]
-      # TODO extract to config?
-      #      need to switch dev/prod...
       Redis.new
     end
   end
