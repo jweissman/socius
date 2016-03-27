@@ -5,9 +5,10 @@ module Socius
       game_view = GameView.find_by(game_id: game_id)
 
       # TODO figure out why `where` won't work here
-      player_view = game_view.player_views.all.select do |pv|
-        pv.player_id == player_id
-      end.first
+      player_view = game_view.player_views.where(player_id: player_id).first
+      # player_view = game_view.player_views.all.select do |pv|
+      #   pv.player_id == player_id
+      # end.first
 
       if player_view && player_view.world_view
         player_view.world_view.update(center: location)

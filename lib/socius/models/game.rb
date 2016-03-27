@@ -6,7 +6,7 @@ module Socius
     has_one :world
     has_many :players
 
-    after_create { @ticks=0 } #; create_world(dimensions: dimensions) }
+    after_create { @ticks=0 }
 
     STEP_LENGTH_IN_TICKS = 100
 
@@ -29,8 +29,6 @@ module Socius
     end
 
     def setup(dimensions:, player_name:, player_id:, city_name:, city_id:)
-      # @ticks = 0
-
       create_world(dimensions: dimensions)
 
       player_two = create_player(id: SecureRandom.uuid, name: "Enemy AI", color: 0xf0c0a0c0)
@@ -38,7 +36,6 @@ module Socius
       capital_two = society_two.create_city(name: "Enemy City", id: SecureRandom.uuid)
       player_two_details = PlayerDetails.new(player_two.id, player_two.name, player_two.color, capital_two.id, capital_two.name, capital_two.location)
 
-      # TODO figure out why this ordering matters -- almost certainly checking `Society.last` in specs...
       player_one = create_player(id: player_id, name: player_name, color: 0xf0a0c0a0)
       society_one = player_one.create_society(world_id: world.id)
       capital_one = society_one.create_city(name: city_name, id: city_id)
@@ -72,16 +69,21 @@ module Socius
     end
 
     def pickup(citizen, player_id:)
+      player = Player.find(player_id)
+      player.currently_held_citizen = citizen
+      player.currently_held_citizen.job_id = nil
+
       # TODO move currently_held_citizen onto player obj
-      self.currently_held_citizen = citizen
-      self.currently_held_citizen.job_id = nil
+      # self.currently_held_citizen = citizen
+      # self.currently_held_citizen.job_id = nil
 
       emit(CitizenPickedUpEvent.create(game_id: self.id, player_id: player_id))
     end
 
     def drop_citizen(new_job, player_id:)
-      self.currently_held_citizen.job_id = new_job.id
-      self.currently_held_citizen = nil
+      player = Player.find(player_id)
+      player.currently_held_citizen.job_id = new_job.id
+      player.currently_held_citizen = nil
 
       emit(CitizenDroppedEvent.create(game_id: self.id, player_id: player_id))
     end
